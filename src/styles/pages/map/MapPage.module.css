@@ -217,6 +217,9 @@
   margin: 0;
   padding: 10px;
   color: #000;
+  -webkit-text-stroke-width: 0.8px;
+  -webkit-text-stroke-color: #fff;
+  paint-order: stroke fill;
   font-family: SUIT, system-ui, sans-serif;
   font-size: 20px;
   font-style: normal;
