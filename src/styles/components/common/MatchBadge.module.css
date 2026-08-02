@@ -1,0 +1,44 @@
+.badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--Point-Color-1);
+  border-radius: 8px;
+  background: var(--Main-Color);
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+.sm {
+  gap: 8px;
+  width: 72px;
+  height: 70px;
+  padding: 16px 10px;
+}
+
+.md {
+  gap: 12px;
+  width: 86px;
+  height: 96px;
+  padding: 16px 10px;
+  border-width: 2px;
+}
+
+.value {
+  color: var(--Sub-Color);
+  font-family: SUIT, system-ui, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 900;
+  line-height: normal;
+}
+
+.label {
+  color: var(--Sub-Color-2);
+  font-family: SUIT, system-ui, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}

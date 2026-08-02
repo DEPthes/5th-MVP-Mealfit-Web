@@ -50,9 +50,9 @@ src/
 
 ### 원칙
 
-- **공통 UI** → `components/common/`
+- **공통 UI** → `components/common/` (`Tag`, `MatchBadge`, `PagePlaceholder`)
 - **레이아웃** → `components/layout/`
-- **페이지** → `pages/{이름}/` (파일만, 빈 폴더 미리 만들지 않음)
+- **페이지** → `pages/{이름}/` (페이지 전용만)
 - **아이콘** → `assets/icons/`
 - **로고** → 텍스트 스타일 (헤더/푸터 CSS)
 - **스타일** → 실제 CSS가 있을 때만 `styles/`에 같은 경로로 추가

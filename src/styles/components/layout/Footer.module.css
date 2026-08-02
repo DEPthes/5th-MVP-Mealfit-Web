@@ -1,5 +1,4 @@
 .footer {
-  margin-top: auto;
   background: var(--Sub-Color-7);
 }
 
@@ -11,7 +10,7 @@
   min-width: var(--layout-min-width);
   max-width: calc(var(--layout-max-width) + var(--layout-side-padding) * 2);
   margin: 0 auto;
-  padding: 0 var(--layout-side-padding) 32px;
+  padding: 0 var(--layout-side-padding) 36px;
 }
 
 .divider {
