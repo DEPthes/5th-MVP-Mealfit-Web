@@ -1,0 +1,20 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-width: var(--layout-min-width);
+  min-height: 100vh;
+  background: var(--Sub-Color-7);
+}
+
+.main {
+  flex: 1;
+  width: 100%;
+}
+
+.content {
+  width: 100%;
+  min-width: var(--layout-min-width);
+  max-width: calc(var(--layout-max-width) + var(--layout-side-padding) * 2);
+  margin: 0 auto;
+  padding: 68px var(--layout-side-padding) 70px;
+}

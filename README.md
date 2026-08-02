@@ -28,12 +28,37 @@ yarn format
 import App from '@/App'
 ```
 
-## CSS Modules
+## Folder Structure
 
-컴포넌트 스타일은 `ComponentName.module.css` 로 작성합니다.
+```text
+src/
+  assets/icons/
+  components/common/      # 공통 UI
+  components/layout/      # Header, Footer, Layout
+  constants/
+  pages/home/HomePage.tsx
+  pages/login/LoginPage.tsx
+  pages/signup/SignupPage.tsx
+  ...
+  styles/
+    index.css
+    components/common/
+    components/layout/
+  App.tsx
+  main.tsx
+```
+
+### 원칙
+
+- **공통 UI** → `components/common/`
+- **레이아웃** → `components/layout/`
+- **페이지** → `pages/{이름}/` (파일만, 빈 폴더 미리 만들지 않음)
+- **아이콘** → `assets/icons/`
+- **로고** → 텍스트 스타일 (헤더/푸터 CSS)
+- **스타일** → 실제 CSS가 있을 때만 `styles/`에 같은 경로로 추가
 
 ```ts
-import styles from './Button.module.css'
+import styles from '@/styles/components/layout/Header.module.css'
 ```
 
 ## Branch Convention
