@@ -1,13 +1,12 @@
 .layout {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
   min-width: var(--layout-min-width);
   min-height: 100vh;
   background: var(--Sub-Color-7);
 }
 
 .main {
-  flex: 1;
   width: 100%;
 }
 
