@@ -1,0 +1,73 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 139px;
+  padding: 16px 20px;
+  border: none;
+  border-top: 1.5px solid transparent;
+  border-bottom: 1.5px solid var(--Sub-Color-6);
+  background: var(--Main-Color);
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.selected {
+  border-top-color: var(--Point-Color-1);
+  border-bottom-color: var(--Point-Color-1);
+  background: var(--Sub-Color-7);
+}
+
+.top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 6px 0;
+  width: 191px;
+}
+
+.name {
+  margin: 0;
+  color: #000;
+  font-family: SUIT, system-ui, sans-serif;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: normal;
+}
+
+.distance {
+  margin: 0;
+  color: var(--Sub-Color-2);
+  font-family: SUIT, system-ui, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background: var(--Sub-Color-5);
+}
+
+.detail {
+  margin: 0;
+  color: var(--Sub-Color-3);
+  font-family: SUIT, system-ui, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
