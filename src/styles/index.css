@@ -1,0 +1,64 @@
+:root {
+  --Main-Color: #ffffff;
+  --Sub-Color: #161a1b;
+  --Sub-Color-2: #383a3e;
+  --Sub-Color-3: #6a6e71;
+  --Sub-Color-4: #b2b5ba;
+  --Sub-Color-5: #d4d5d9;
+  --Sub-Color-6: #e1e2e4;
+  --Sub-Color-7: #f3f3f3;
+  --Point-Color-1: #00d4ac;
+  --Point-Color-2: #56eed1;
+  --Point-Color-3: #8af7e2;
+  --Point-Color-4: #e3fbf6;
+
+  --font-family: 'SUIT', system-ui, sans-serif;
+  --layout-max-width: 1200px;
+  --layout-side-padding: 120px;
+  --layout-min-width: 1440px;
+  --header-height: 80px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+html {
+  overflow-x: auto;
+}
+
+body {
+  min-width: var(--layout-min-width);
+  font-family: var(--font-family);
+  color: var(--Sub-Color);
+  background: var(--Sub-Color-7);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}

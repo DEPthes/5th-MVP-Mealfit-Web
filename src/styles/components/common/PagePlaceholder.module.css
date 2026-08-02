@@ -1,0 +1,11 @@
+.section {
+  min-height: 360px;
+}
+
+.title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--Sub-Color);
+}
