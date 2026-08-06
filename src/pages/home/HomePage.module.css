@@ -1,0 +1,472 @@
+:root {
+  --color-primary: #00d4ac;
+  --color-primary-light: #56eed1;
+  --color-primary-bg: #e3fbf6;
+  --color-text-heading: #161a1b;
+  --color-text-body: #383a3e;
+  --color-text-muted: #6a6e71;
+  --color-border: #e1e2e4;
+  --color-border-soft: #cbd5e1;
+  --color-bg-soft: #f8fafc;
+  --color-bg-soft-alt: #f1f5f9;
+  --color-badge-bg: #f3f3f3;
+  --color-white: #ffffff;
+}
+
+.pageWrapper {
+  width: 1440px;
+  min-width: 1440px;
+  margin: 0 auto;
+  padding: 40px 60px 100px;
+  box-sizing: border-box;
+}
+
+.pageTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text-heading);
+  margin-bottom: 32px;
+}
+
+.contentContainer {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.leftBoard {
+  width: 470px;
+  flex-shrink: 0;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 28px;
+  box-sizing: border-box;
+}
+
+.boardHeader {
+  margin-bottom: 20px;
+}
+
+.boardTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: -0.3px;
+}
+
+.inbodyNoticeCard {
+  background-color: var(--color-bg-soft);
+  border: 1px solid var(--color-bg-soft-alt);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.inbodyText {
+  font-size: 14px;
+  color: var(--color-text-body);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.uploadBtn {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.uploadIcon {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background-color: var(--color-border);
+  margin: 24px 0;
+}
+
+.sectionTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-heading);
+}
+
+.sectionSubTitle {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-weight: 400;
+  margin-left: 6px;
+}
+
+.sectionDesc {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+  margin-bottom: 16px;
+}
+
+.graphBox {
+  background-color: var(--color-bg-soft);
+  border-radius: 12px;
+  padding: 20px 16px;
+  margin-top: 12px;
+}
+
+.chartSvg {
+  width: 100%;
+  height: 160px;
+  overflow: visible;
+}
+
+.chartGrid {
+  stroke: var(--color-border);
+  stroke-dasharray: 4, 4;
+}
+
+.chartYText {
+  font-size: 10px;
+  fill: var(--color-text-muted);
+}
+
+.chartXText {
+  font-size: 11px;
+  fill: var(--color-text-muted);
+}
+
+.chartLine {
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-width: 2.5;
+}
+
+.chartPoint {
+  fill: var(--color-primary);
+  stroke: var(--color-white);
+  stroke-width: 2;
+}
+
+.targetGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+.targetCard {
+  background-color: var(--color-primary-bg);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+.targetLabel {
+  font-size: 12px;
+  color: var(--color-text-body);
+  margin-bottom: 8px;
+}
+
+.targetValue {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-text-heading);
+}
+
+.targetUnit {
+  font-size: 14px;
+  font-weight: 600;
+  margin-left: 2px;
+}
+
+.badgeGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.tagBadge {
+  background-color: var(--color-badge-bg);
+  color: var(--color-text-body);
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.reportList {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 20px 0;
+}
+
+.reportItem {
+  font-size: 14px;
+  color: var(--color-text-body);
+  margin-bottom: 10px;
+  position: relative;
+  padding-left: 14px;
+}
+
+.reportItem::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--color-primary);
+}
+
+.reportBtn {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--color-white);
+  border: 1.5px solid var(--color-primary);
+  color: var(--color-primary);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rightBoard {
+  width: 590px;
+  flex-shrink: 0;
+}
+
+.recommendHeader {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text-body);
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+}
+
+.filterList {
+  display: flex;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+.filterDivider {
+  width: 100%;
+  height: 1px;
+  background-color: var(--color-border);
+  margin: 16px 0 20px 0;
+}
+
+.filterChip {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-white);
+  color: var(--color-text-body);
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.filterChipActive {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+  font-weight: 700;
+}
+
+/* 광고 배너 */
+.adBanner {
+  position: relative;
+  width: 590px;
+  height: 71px;
+  background-color: var(--color-primary-light); 
+  border-radius: 0;
+  box-sizing: border-box;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.adLeft {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 457px;
+  height: 100%;
+  background-color: var(--color-primary); 
+  border-radius: 0 50.4px 50.4px 0 / 0 100% 100% 0; 
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 20px;
+  box-sizing: border-box;
+  z-index: 1;
+}
+
+.adBadge {
+  background-color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 11px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.adImagePlaceholder {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.adTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-heading); 
+  line-height: 1.3;
+}
+
+.adBtn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 161px;
+  background-color: transparent;
+  color: var(--color-white);
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.foodList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.foodCard {
+  position: relative;
+  width: 590px;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 24px 24px 24px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.foodAccentBar {
+  position: absolute;
+  left: 12px;
+  top: 20px;
+  bottom: 20px;
+  width: 4px;
+  border-radius: 2px;
+  background-color: var(--color-primary);
+}
+
+.foodContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.foodTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text-heading);
+  margin-bottom: 8px;
+}
+
+.foodTag {
+  align-self: flex-start;
+  font-size: 11px;
+  border: 1px solid var(--color-border-soft);
+  color: var(--color-text-body);
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.foodNutriText {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+}
+
+.restaurantText {
+  font-size: 13px;
+  color: var(--color-text-body);
+}
+
+.priceHighlight {
+  color: var(--color-primary);
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.matchRightBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.matchSquare {
+  width: 86px;
+  height: 96px;
+  border: 2px solid var(--color-primary);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.matchNum {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-text-heading);
+  line-height: 1;
+}
+
+.matchLabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+.mapActionBtn {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--color-primary);
+  margin-top: 10px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.mapIcon {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+}
