@@ -1,5 +1,6 @@
 import { Link, NavLink } from 'react-router-dom'
 import { NAV_ITEMS } from '@/constants/navigation'
+import logoIcon from '@/assets/icons/logo.svg'
 import chevronDown from '@/assets/icons/chevron-down.svg'
 import styles from '@/styles/components/layout/Header.module.css'
 
@@ -8,7 +9,16 @@ export function Header() {
     <header className={styles.header}>
       <div className={styles.inner}>
         <div className={styles.left}>
-          <Link to="/" className={styles.logo}>
+          <Link 
+            to="/" 
+            className={styles.logo} 
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+          >
+            <img
+              src={logoIcon}
+              alt="MealFit 로고"
+              style={{ width: '28px', height: '28px', objectFit: 'contain' }}
+            />
             MealFit
           </Link>
           <nav className={styles.nav} aria-label="주요 메뉴">
