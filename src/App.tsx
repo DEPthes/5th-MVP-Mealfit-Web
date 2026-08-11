@@ -6,6 +6,7 @@ import { AiReportPage } from '@/pages/ai-report/AiReportPage'
 import { MapPage } from '@/pages/map/MapPage'
 import { LoginPage } from '@/pages/login/LoginPage'
 import { SignupPage } from '@/pages/signup/SignupPage'
+import { MyPage } from '@/pages/mypage/MyPage'
 import { AboutPage } from '@/pages/about/AboutPage'
 import { TermsPage } from '@/pages/terms/TermsPage'
 import { PrivacyPage } from '@/pages/privacy/PrivacyPage'
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="map" element={<MapPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="signup" element={<SignupPage />} />
+          <Route path="mypage" element={<MyPage />} />
           <Route path="about" element={<AboutPage />} />
           <Route path="terms" element={<TermsPage />} />
           <Route path="privacy" element={<PrivacyPage />} />

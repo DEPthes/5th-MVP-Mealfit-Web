@@ -1,10 +1,23 @@
-import { Link, NavLink } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { NAV_ITEMS } from '@/constants/navigation'
 import logoIcon from '@/assets/icons/logo.svg'
 import chevronDown from '@/assets/icons/chevron-down.svg'
 import styles from '@/styles/components/layout/Header.module.css'
 
 export function Header() {
+  const [isOpen, setIsOpen] = useState(false)
+  const navigate = useNavigate()
+
+  const toggleDropdown = () => {
+    setIsOpen((prev) => !prev)
+  }
+
+  const handleLogout = () => {
+    setIsOpen(false)
+    navigate('/login')
+  }
+
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
@@ -37,16 +50,42 @@ export function Header() {
           </nav>
         </div>
 
-        <button type="button" className={styles.profile} aria-label="프로필 메뉴">
-          <span>김명지</span>
-          <img
-            src={chevronDown}
-            alt=""
-            width={10}
-            height={5}
-            className={styles.chevron}
-          />
-        </button>
+        <div className={styles.profileContainer}>
+          <button 
+            type="button" 
+            className={styles.profile} 
+            aria-label="프로필 메뉴"
+            onClick={toggleDropdown}
+          >
+            <span>김명지</span>
+            <img
+              src={chevronDown}
+              alt=""
+              width={10}
+              height={5}
+              className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ''}`}
+            />
+          </button>
+
+          {isOpen && (
+            <div className={styles.dropdown}>
+              <Link 
+                to="/mypage" 
+                className={styles.dropdownItem}
+                onClick={() => setIsOpen(false)}
+              >
+                마이페이지
+              </Link>
+              <button 
+                type="button" 
+                className={styles.dropdownItem}
+                onClick={handleLogout}
+              >
+                로그아웃
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   )
