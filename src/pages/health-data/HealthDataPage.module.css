@@ -1,0 +1,337 @@
+:root {
+  --color-point: #00d4ac;
+  --color-sub-7: #f3f3f3;
+  --color-sub-4: #b2b5ba;
+  --color-sub-8: #fbfbfb;
+  --color-sub-6: #e1e2e4;
+  --color-main: #ffffff;
+  --color-text-1: #161a1b;
+  --color-text-2: #383a3e;
+  --color-text-3: #6a6e71;
+}
+
+.pageWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 40px 0 100px;
+  box-sizing: border-box;
+}
+
+.container {
+  width: 1200px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 상단 타이틀 */
+.titleSection {
+  margin-bottom: 32px;
+}
+
+.pageTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text-1);
+  margin-bottom: 8px;
+}
+
+.pageDesc {
+  font-size: 14px;
+  color: var(--color-text-3);
+  margin: 0;
+}
+
+/* 섹션 공통 */
+.section {
+  margin-bottom: 40px;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-point);
+  margin-bottom: 12px;
+}
+
+.cardContainer {
+  width: 1200px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 01. 인바디 카드 */
+.uploadCard {
+  width: 1182px;
+  background-color: var(--color-main);
+  border: 1px solid var(--color-sub-4);
+  border-radius: 5px;
+  padding: 24px;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+
+.cardSubTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-1);
+  margin-bottom: 16px;
+}
+
+.dropZone {
+  width: 100%;
+  height: 140px;
+  background-color: var(--color-sub-7);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.dropTextPrimary {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-1);
+  margin-bottom: 4px;
+}
+
+.dropTextSecondary {
+  font-size: 12px;
+  color: var(--color-text-3);
+  margin: 0;
+}
+
+.uploadStatusRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.statusText {
+  font-size: 13px;
+  color: var(--color-text-3);
+}
+
+.reuploadBtn {
+  padding: 6px 12px;
+  border: 1px solid var(--color-sub-4);
+  background-color: var(--color-main);
+  border-radius: 5px;
+  font-size: 12px;
+  color: var(--color-text-2);
+  cursor: pointer;
+}
+
+/* 아코디언 카드 */
+.accordionBox {
+  width: 1182px;
+  background-color: var(--color-main);
+  border: 1px solid var(--color-sub-4);
+  border-radius: 5px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.accordionHeader {
+  width: 100%;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-1);
+  cursor: pointer;
+}
+
+.arrow {
+  font-size: 10px;
+  transition: transform 0.2s ease;
+  color: var(--color-text-3);
+}
+
+.arrow.open {
+  transform: rotate(180deg);
+}
+
+.accordionContent {
+  padding: 0 24px 24px;
+  border-top: 1px solid var(--color-sub-6);
+}
+
+.contentDesc {
+  font-size: 12px;
+  color: var(--color-text-3);
+  margin: 16px 0;
+}
+
+.dataGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dataRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--color-sub-7);
+}
+
+.dataRow:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.dataLabel {
+  font-size: 13px;
+  color: var(--color-text-1);
+}
+
+.dataValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-point);
+}
+
+/* 02, 03 입력 카드 */
+.formCard {
+  width: 1182px;
+  background-color: var(--color-main);
+  border: 1px solid var(--color-sub-4);
+  border-radius: 5px;
+  padding: 24px;
+  box-sizing: border-box;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.formLabel {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-1);
+}
+
+.btnGroup3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.btnGrid2x2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.selectBtn {
+  height: 48px;
+  background-color: var(--color-sub-7);
+  border: 1px solid transparent;
+  border-radius: 5px;
+  font-size: 14px;
+  color: var(--color-text-2);
+  cursor: pointer;
+}
+
+.selectBtn.active {
+  background-color: #e6fbf7;
+  border-color: var(--color-point);
+  color: var(--color-text-1);
+  font-weight: 700;
+}
+
+.textInput {
+  width: 100%;
+  height: 48px;
+  border: 1px solid var(--color-sub-4);
+  border-radius: 5px;
+  padding: 0 16px;
+  box-sizing: border-box;
+  font-size: 14px;
+  outline: none;
+}
+
+/* 03 기저질환 체크박스 */
+.checkboxList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--color-sub-4);
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-text-1);
+}
+
+.checkboxInput {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-point);
+  cursor: pointer;
+}
+
+/* 하단 요약 및 버튼 */
+.bottomSummarySection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.summaryTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-1);
+}
+
+.badgeList {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 8px 14px;
+  border: 1px solid var(--color-point);
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--color-point);
+  background-color: var(--color-main);
+  font-weight: 600;
+}
+
+.submitBtn {
+  width: 1200px;
+  height: 48px;
+  background-color: var(--color-point);
+  border: none;
+  border-radius: 5px;
+  color: var(--color-main);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
