@@ -54,6 +54,10 @@
   color: var(--Point-Color-1);
 }
 
+.profileContainer {
+  position: relative;
+}
+
 .profile {
   display: flex;
   flex-shrink: 0;
@@ -71,11 +75,53 @@
   color: var(--Sub-Color);
   white-space: nowrap;
   box-sizing: border-box;
+  cursor: pointer;
+  border: none;
 }
 
 .chevron {
   width: 10px;
   height: 5px;
   flex-shrink: 0;
+  transform: rotate(0deg);
+  transition: transform 0.2s ease;
+}
+
+.chevronOpen {
   transform: rotate(180deg);
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 112px;
+  background: var(--Main-Color, #ffffff);
+  border: 1px solid var(--Sub-Color-7, #e1e2e4);
+  border-radius: 8px;
+  padding: 8px 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+
+.dropdownItem {
+  display: block;
+  width: 100%;
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--Sub-Color, #161a1b);
+  text-decoration: none;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.dropdownItem:hover {
+  background-color: var(--Sub-Color-6, #f8fafc);
+  color: var(--Point-Color-1, #00d4ac);
 }
