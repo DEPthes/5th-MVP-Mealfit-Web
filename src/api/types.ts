@@ -64,10 +64,10 @@ export type MatchReason =
 export type ReferencePoint = 'MAIN_GATE' | 'BACK_GATE'
 
 export interface Nutrition {
-  calories: number
-  carbohydrate: number
-  protein: number
-  fat: number
+  calories?: number
+  carbohydrate?: number
+  protein?: number
+  fat?: number
   sodium?: number
   source?: NutritionSource
   confidence?: number
@@ -78,16 +78,16 @@ export interface RestaurantResponse {
   name: string
   address: string
   cuisine: Cuisine
-  distanceToMainGate?: number
-  distanceToBackGate?: number
+  distanceToMainGate?: number | null
+  distanceToBackGate?: number | null
 }
 
 export interface MenuSearchResponse {
   menuId: number
   menuName: string
-  price?: number
+  price?: number | null
   foodTypes: FoodType[]
-  nutrition?: Nutrition
+  nutrition?: Nutrition | null
   restaurantId: number
   restaurantName: string
   cuisine: Cuisine

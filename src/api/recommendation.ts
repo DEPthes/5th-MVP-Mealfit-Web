@@ -24,7 +24,7 @@ export interface RecommendationParams {
 
 export interface RecommendedMenu {
   menu: MenuSearchResponse
-  matchRate?: number
+  matchRate?: number | null
   proteinTargetPercent?: number
   warnings: string[]
 }
@@ -34,7 +34,7 @@ export interface RecommendationItem {
   menus: RecommendedMenu[]
   matchedMenuCount: number
   matchReason: MatchReason
-  topMatchRate?: number
+  topMatchRate?: number | null
   distanceMeters?: number
   walkingMinutes?: number
   distanceBasis: string
