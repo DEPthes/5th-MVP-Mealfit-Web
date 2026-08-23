@@ -31,9 +31,8 @@ export function Footer() {
           </Link>
           <nav className={styles.links} aria-label="푸터 메뉴">
             {FOOTER_LINKS.map((item) => (
-              <Link
+              <span
                 key={item.path}
-                to={item.path}
                 className={
                   item.path === '/privacy'
                     ? `${styles.link} ${styles.linkPrivacy}`
@@ -41,7 +40,7 @@ export function Footer() {
                 }
               >
                 {item.label}
-              </Link>
+              </span>
             ))}
           </nav>
         </div>
