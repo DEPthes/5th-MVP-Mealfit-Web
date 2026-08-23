@@ -1,7 +1,7 @@
 import { type FormEvent, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import styles from './LoginPage.module.css'
-import { login, signup } from '@/api/auth'
+import { DEMO_ACCOUNT, login, signup } from '@/api/auth'
 import type { ActivityLevel, Gender, Goal } from '@/api/types'
 import { saveAuthSession } from '@/utils/authSession'
 
@@ -13,6 +13,14 @@ type LoginPageProps = {
 
 export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
   const navigate = useNavigate()
+  const location = useLocation()
+  const redirectTo =
+    typeof location.state === 'object' &&
+    location.state !== null &&
+    'from' in location.state &&
+    typeof location.state.from === 'string'
+      ? location.state.from
+      : '/'
   const [mode, setMode] = useState<AuthMode>(initialMode)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -55,7 +63,7 @@ export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
     try {
       if (mode === 'login') {
         await saveLogin()
-        navigate('/')
+        navigate(redirectTo, { replace: true })
         return
       }
 
@@ -120,6 +128,11 @@ export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
             ? '가입했던 이메일을 입력하시면 비밀번호 재설정 링크를 보냅니다.'
             : '사용자는 이메일과 비밀번호로 회원가입 후 로그인하여 서비스를 이용합니다.'}
         </p>
+        {mode === 'login' && (
+          <p className={styles.subTitle}>
+            임시 계정: {DEMO_ACCOUNT.email} / {DEMO_ACCOUNT.password}
+          </p>
+        )}
       </div>
 
       {/* 로그인/회원가입 탭 */}

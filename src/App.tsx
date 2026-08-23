@@ -1,4 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { GuestRoute } from '@/components/auth/GuestRoute'
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { Layout } from '@/components/layout/Layout'
 import { HomePage } from '@/pages/home/HomePage'
 import { HealthDataPage } from '@/pages/health-data/HealthDataPage'
@@ -18,13 +20,17 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
-          <Route index element={<HomePage />} />
-          <Route path="health-data" element={<HealthDataPage />} />
-          <Route path="ai-report" element={<AiReportPage />} />
-          <Route path="map" element={<MapPage />} />
-          <Route path="login" element={<LoginPage />} />
-          <Route path="signup" element={<SignupPage />} />
-          <Route path="mypage" element={<MyPage />} />
+          <Route element={<ProtectedRoute />}>
+            <Route index element={<HomePage />} />
+            <Route path="health-data" element={<HealthDataPage />} />
+            <Route path="ai-report" element={<AiReportPage />} />
+            <Route path="map" element={<MapPage />} />
+            <Route path="mypage" element={<MyPage />} />
+          </Route>
+          <Route element={<GuestRoute />}>
+            <Route path="login" element={<LoginPage />} />
+            <Route path="signup" element={<SignupPage />} />
+          </Route>
           <Route path="about" element={<AboutPage />} />
           <Route path="terms" element={<TermsPage />} />
           <Route path="privacy" element={<PrivacyPage />} />
