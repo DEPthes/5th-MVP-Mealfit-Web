@@ -18,6 +18,7 @@ import {
   type MemberProfile,
 } from '@/api/member'
 import type { ActivityLevel, Disease, Goal } from '@/api/types'
+import { updateStoredNickname } from '@/utils/authSession'
 
 const GOAL_OPTIONS = [
   { label: '체중 감량', value: 'LOSS' as Goal },
@@ -65,6 +66,8 @@ export function HealthDataPage() {
   const [targetData, setTargetData] = useState<TargetResponse | null>(null)
   const [profile, setProfile] = useState<MemberProfile | null>(null)
 
+  const [nickname, setNickname] = useState('')
+  const [height, setHeight] = useState('')
   const [targetWeight, setTargetWeight] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [isUploading, setIsUploading] = useState(false)
@@ -88,6 +91,8 @@ export function HealthDataPage() {
             const member = profileResponse.data
 
             setProfile(member)
+            setNickname(member.nickname)
+            setHeight(member.height?.toString() ?? '')
             setSelectedGoal(member.goal)
             setSelectedFreq(member.activityLevel)
             setSelectedDiseases(member.diseases ?? [])
@@ -183,13 +188,39 @@ export function HealthDataPage() {
     setMessage('저장하고 목표 영양치를 계산하고 있습니다...')
 
     try {
+      const trimmedNickname = nickname.trim()
+      const parsedHeight = height ? Number(height) : undefined
+
+      if (!trimmedNickname) {
+        setMessage('닉네임을 입력해 주세요.')
+        setIsSaving(false)
+        return
+      }
+
+      if (parsedHeight !== undefined && parsedHeight <= 0) {
+        setMessage('키는 양수로 입력해 주세요.')
+        setIsSaving(false)
+        return
+      }
+
       // 서버 명세에는 목표 체중과 운동 강도 필드가 없습니다.
       // 현재 UI의 운동 횟수를 서버의 ActivityLevel로 사용합니다.
       await updateMyProfile({
+        nickname: trimmedNickname,
+        height: parsedHeight,
         goal: selectedGoal,
         activityLevel: selectedFreq,
         diseases: selectedDiseases,
       })
+
+      updateStoredNickname(trimmedNickname)
+
+      const profileResponse = await getMyProfile()
+      if (profileResponse.data) {
+        setProfile(profileResponse.data)
+        setNickname(profileResponse.data.nickname)
+        setHeight(profileResponse.data.height?.toString() ?? '')
+      }
 
       const targetResponse = await calculateTargets()
 
@@ -260,6 +291,9 @@ export function HealthDataPage() {
                 <div className={styles.uploadStatusRow}>
                   <span className={styles.statusText}>
                     인식 완료 — {inbodyData.measuredAt}
+                    {inbodyData.stale
+                      ? ' · 측정일이 오래되어 갱신이 필요합니다.'
+                      : ''}
                   </span>
 
                   <button
@@ -372,6 +406,13 @@ export function HealthDataPage() {
                     하루·한 끼 목표 영양치를 계산합니다.
                   </p>
 
+                  {targetData?.outdated && (
+                    <p className={styles.outdatedNotice}>
+                      인바디나 프로필이 바뀌어 목표 영양치가
+                      오래되었습니다. 아래에서 다시 저장하면 갱신됩니다.
+                    </p>
+                  )}
+
                   <div className={styles.dataGrid}>
                     <div className={styles.dataRow}>
                       <span className={styles.dataLabel}>
@@ -431,6 +472,38 @@ export function HealthDataPage() {
 
           <div className={styles.cardContainer}>
             <div className={styles.formCard}>
+              <div className={styles.formRow}>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel} htmlFor="health-nickname">
+                    닉네임
+                  </label>
+                  <input
+                    id="health-nickname"
+                    type="text"
+                    value={nickname}
+                    onChange={(event) => setNickname(event.target.value)}
+                    className={styles.textInput}
+                    required
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel} htmlFor="health-height">
+                    키 (cm)
+                  </label>
+                  <input
+                    id="health-height"
+                    type="number"
+                    min="0.1"
+                    step="0.1"
+                    placeholder="예: 175.0"
+                    value={height}
+                    onChange={(event) => setHeight(event.target.value)}
+                    className={styles.textInput}
+                  />
+                </div>
+              </div>
+
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>목표</label>
 

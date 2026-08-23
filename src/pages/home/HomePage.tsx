@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import styles from './HomePage.module.css'
 import mapIcon from '@/assets/icons/map.svg'
 import uploadIcon from '@/assets/icons/share.svg'
@@ -9,75 +10,26 @@ import {
 } from '@/api/inbody'
 import {
   getMyTargets,
+  getScoreHistory,
+  type ScoreHistoryItem,
   type TargetResponse,
 } from '@/api/analysis'
 import {
   getMyProfile,
   type MemberProfile,
 } from '@/api/member'
-
-const filters = [
-  '1만원 이하',
-  '역류성식도염 안전',
-  '고단백',
-  '저지방',
-  '저탄수',
-  '고탄수',
-  '저나트륨',
-]
-
-const foods = [
-  {
-    id: 1,
-    name: '보쌈정식',
-    tag: '고단백',
-    detail:
-      '단백질 00g · 하루 목표(000g)의 00% 충족 · 100g당 단백질 00g',
-    restaurant: '한솔 식당 · 명지대 정류장 기준 000 m',
-    price: '00,000원 · 도보 0분',
-    match: '00%',
-  },
-  {
-    id: 2,
-    name: '연어덮밥',
-    tag: '고단백',
-    detail:
-      '단백질 00g · 하루 목표(000g)의 00% 충족 · 100g당 단백질 00g',
-    restaurant: '한솔 식당 · 명지대 정류장 기준 000 m',
-    price: '00,000원 · 도보 0분',
-    match: '00%',
-  },
-  {
-    id: 3,
-    name: '닭가슴살 샐러드볼',
-    tag: '고단백',
-    detail:
-      '단백질 00g · 하루 목표(000g)의 00% 충족 · 100g당 단백질 00g',
-    restaurant: '한솔 식당 · 명지대 정류장 기준 000 m',
-    price: '8,500원 · 도보 5분',
-    match: '00%',
-  },
-  {
-    id: 4,
-    name: '순두부찌개',
-    tag: '저나트륨',
-    detail:
-      '단백질 00g · 하루 목표(000g)의 00% 충족 · 100g당 단백질 00g',
-    restaurant: '한솔 식당 · 명지대 정류장 기준 000 m',
-    price: '10,000원 · 도보 10분',
-    match: '00%',
-  },
-  {
-    id: 5,
-    name: '순두부찌개',
-    tag: '저나트륨',
-    detail:
-      '단백질 00g · 하루 목표(000g)의 00% 충족 · 100g당 단백질 00g',
-    restaurant: '한솔 식당 · 명지대 정류장 기준 000 m',
-    price: '10,000원 · 도보 10분',
-    match: '00%',
-  },
-]
+import {
+  getRecommendations,
+  type RecommendationItem,
+} from '@/api/recommendation'
+import { ScoreTrendChart } from '@/components/charts/ScoreTrendChart'
+import {
+  formatHomeDetail,
+  formatHomePrice,
+  formatHomeRestaurant,
+  formatMatchRate,
+  HOME_FILTERS,
+} from './homeRecommend'
 
 const goalLabels: Record<string, string> = {
   LOSS: '체중 감량',
@@ -100,7 +52,16 @@ const diseaseLabels: Record<string, string> = {
 }
 
 export function HomePage() {
-  const [selectedFilter, setSelectedFilter] = useState('1만원 이하')
+  const navigate = useNavigate()
+  const [selectedFilter, setSelectedFilter] = useState(
+    HOME_FILTERS[0].label,
+  )
+  const [recommendations, setRecommendations] = useState<
+    RecommendationItem[]
+  >([])
+  const [isRecommendLoading, setIsRecommendLoading] =
+    useState(true)
+  const [recommendError, setRecommendError] = useState('')
 
   const [inbodyData, setInbodyData] =
     useState<InbodyResponse | null>(null)
@@ -110,6 +71,10 @@ export function HomePage() {
 
   const [profile, setProfile] =
     useState<MemberProfile | null>(null)
+
+  const [scoreHistory, setScoreHistory] = useState<
+    ScoreHistoryItem[]
+  >([])
 
   const [isLoading, setIsLoading] = useState(true)
 
@@ -150,6 +115,21 @@ export function HomePage() {
         } catch (error) {
           console.info('목표 영양치가 없습니다.', error)
         }
+
+        // 인바디 점수 추이
+        try {
+          const response = await getScoreHistory()
+
+          if (response.data) {
+            setScoreHistory(
+              [...response.data].sort((a, b) =>
+                a.measuredAt.localeCompare(b.measuredAt),
+              ),
+            )
+          }
+        } catch (error) {
+          console.info('점수 이력이 없습니다.', error)
+        }
       } finally {
         setIsLoading(false)
       }
@@ -157,6 +137,56 @@ export function HomePage() {
 
     void fetchHomeData()
   }, [])
+
+  useEffect(() => {
+    let ignore = false
+
+    const fetchRecommendations = async () => {
+      const filter = HOME_FILTERS.find(
+        (item) => item.label === selectedFilter,
+      )
+
+      setIsRecommendLoading(true)
+      setRecommendError('')
+
+      try {
+        const response = await getRecommendations({
+          maxPrice: filter?.maxPrice,
+          nutritionFilter: filter?.nutritionFilter,
+          referencePoint: 'MAIN_GATE',
+          page: 0,
+          size: 5,
+        })
+
+        if (!response.success || !response.data) {
+          throw new Error(response.message)
+        }
+
+        if (!ignore) {
+          setRecommendations(response.data.content)
+        }
+      } catch (error) {
+        if (!ignore) {
+          setRecommendations([])
+          setRecommendError(
+            error instanceof Error
+              ? error.message
+              : '추천 메뉴를 불러오지 못했습니다.',
+          )
+        }
+      } finally {
+        if (!ignore) {
+          setIsRecommendLoading(false)
+        }
+      }
+    }
+
+    void fetchRecommendations()
+
+    return () => {
+      ignore = true
+    }
+  }, [selectedFilter])
 
   const calories =
     targetData?.dailyTarget?.calories ?? null
@@ -202,11 +232,19 @@ export function HomePage() {
           <div className={styles.inbodyNoticeCard}>
             <p className={styles.inbodyText}>
               {inbodyData ? (
-                <>
-                  최신 인바디 데이터가 반영되어 있어요.
-                  <br />
-                  새로 업로드하면 더 정확해져요.
-                </>
+                inbodyData.stale ? (
+                  <>
+                    측정일이 오래되어 갱신이 필요해요.
+                    <br />
+                    인바디를 다시 업로드해 주세요.
+                  </>
+                ) : (
+                  <>
+                    최신 인바디 데이터가 반영되어 있어요.
+                    <br />
+                    새로 업로드하면 더 정확해져요.
+                  </>
+                )
               ) : (
                 <>
                   아직 인바디 데이터가 없어요.
@@ -219,6 +257,7 @@ export function HomePage() {
             <button
               type="button"
               className={styles.uploadBtn}
+              onClick={() => navigate('/health-data')}
             >
               업로드
               <img
@@ -240,89 +279,16 @@ export function HomePage() {
             </div>
 
             <div className={styles.graphBox}>
-              <svg
+              <ScoreTrendChart
+                items={scoreHistory}
                 className={styles.chartSvg}
-                viewBox="0 0 320 140"
-              >
-                <line
-                  x1="30"
-                  y1="20"
-                  x2="310"
-                  y2="20"
-                  className={styles.chartGrid}
-                />
-                <text
-                  x="5"
-                  y="24"
-                  className={styles.chartYText}
-                >
-                  70
-                </text>
-
-                <line
-                  x1="30"
-                  y1="50"
-                  x2="310"
-                  y2="50"
-                  className={styles.chartGrid}
-                />
-                <text
-                  x="5"
-                  y="54"
-                  className={styles.chartYText}
-                >
-                  50
-                </text>
-
-                <line
-                  x1="30"
-                  y1="80"
-                  x2="310"
-                  y2="80"
-                  className={styles.chartGrid}
-                />
-                <text
-                  x="5"
-                  y="84"
-                  className={styles.chartYText}
-                >
-                  30
-                </text>
-
-                <line
-                  x1="30"
-                  y1="110"
-                  x2="310"
-                  y2="110"
-                  className={styles.chartGrid}
-                />
-                <text
-                  x="5"
-                  y="114"
-                  className={styles.chartYText}
-                >
-                  10
-                </text>
-
-                {inbodyData?.inbodyScore != null && (
-                  <>
-                    <circle
-                      cx="170"
-                      cy="80"
-                      r="4"
-                      className={styles.chartPoint}
-                    />
-
-                    <text
-                      x="160"
-                      y="132"
-                      className={styles.chartXText}
-                    >
-                      최근
-                    </text>
-                  </>
-                )}
-              </svg>
+                emptyClassName={styles.chartEmpty}
+                gridClassName={styles.chartGrid}
+                lineClassName={styles.chartLine}
+                pointClassName={styles.chartPoint}
+                yTextClassName={styles.chartYText}
+                xTextClassName={styles.chartXText}
+              />
             </div>
           </div>
 
@@ -340,6 +306,14 @@ export function HomePage() {
               체중·골격근량·기초대사량과 목표·활동량 기반으로
               계산돼요.
             </div>
+
+            {targetData?.outdated && (
+              <p className={styles.outdatedNotice}>
+                인바디나 프로필이 바뀌어 목표 영양치가
+                오래되었습니다. 건강 데이터에서 다시 저장하면
+                갱신됩니다.
+              </p>
+            )}
 
             <div className={styles.targetGrid}>
               <div className={styles.targetCard}>
@@ -423,6 +397,7 @@ export function HomePage() {
             <button
               type="button"
               className={styles.reportBtn}
+              onClick={() => navigate('/ai-report')}
             >
               AI 영양 리포트 자세히 보기
             </button>
@@ -435,18 +410,18 @@ export function HomePage() {
           </div>
 
           <div className={styles.filterList}>
-            {filters.map((filter) => (
+            {HOME_FILTERS.map((filter) => (
               <button
-                key={filter}
+                key={filter.label}
                 type="button"
                 className={`${styles.filterChip} ${
-                  selectedFilter === filter
+                  selectedFilter === filter.label
                     ? styles.filterChipActive
                     : ''
                 }`}
-                onClick={() => setSelectedFilter(filter)}
+                onClick={() => setSelectedFilter(filter.label)}
               >
-                {filter}
+                {filter.label}
               </button>
             ))}
           </div>
@@ -471,60 +446,87 @@ export function HomePage() {
           </div>
 
           <div className={styles.foodList}>
-            {foods.map((food) => (
-              <div
-                key={food.id}
-                className={styles.foodCard}
-              >
-                <div className={styles.foodAccentBar} />
+            {isRecommendLoading && (
+              <p className={styles.foodStatus}>
+                추천 메뉴를 불러오는 중입니다.
+              </p>
+            )}
 
-                <div className={styles.foodContent}>
-                  <div className={styles.foodTitle}>
-                    {food.name}
-                  </div>
+            {!isRecommendLoading && recommendError && (
+              <p className={styles.foodStatus}>{recommendError}</p>
+            )}
 
-                  <span className={styles.foodTag}>
-                    {food.tag}
-                  </span>
+            {!isRecommendLoading &&
+              !recommendError &&
+              recommendations.length === 0 && (
+                <p className={styles.foodStatus}>
+                  조건에 맞는 추천 메뉴가 없습니다.
+                </p>
+              )}
 
-                  <div className={styles.foodNutriText}>
-                    {food.detail}
-                  </div>
+            {!isRecommendLoading &&
+              !recommendError &&
+              recommendations.map((item) => {
+                const menuName =
+                  item.menus[0]?.menu.menuName ??
+                  item.restaurant.name
 
-                  <div className={styles.restaurantText}>
-                    {food.restaurant}
-                    <span
-                      className={styles.priceHighlight}
-                    >
-                      {food.price}
-                    </span>
-                  </div>
-                </div>
-
-                <div className={styles.matchRightBox}>
-                  <div className={styles.matchSquare}>
-                    <span className={styles.matchNum}>
-                      {food.match}
-                    </span>
-                    <span className={styles.matchLabel}>
-                      MATCH
-                    </span>
-                  </div>
-
-                  <button
-                    type="button"
-                    className={styles.mapActionBtn}
+                return (
+                  <div
+                    key={item.restaurant.restaurantId}
+                    className={styles.foodCard}
                   >
-                    <img
-                      src={mapIcon}
-                      alt="지도"
-                      className={styles.mapIcon}
-                    />
-                    <span>지도에서 보기</span>
-                  </button>
-                </div>
-              </div>
-            ))}
+                    <div className={styles.foodAccentBar} />
+
+                    <div className={styles.foodContent}>
+                      <div className={styles.foodTitle}>
+                        {menuName}
+                      </div>
+
+                      <span className={styles.foodTag}>
+                        {selectedFilter}
+                      </span>
+
+                      <div className={styles.foodNutriText}>
+                        {formatHomeDetail(item, protein)}
+                      </div>
+
+                      <div className={styles.restaurantText}>
+                        {formatHomeRestaurant(item)}
+                        <span
+                          className={styles.priceHighlight}
+                        >
+                          {formatHomePrice(item)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className={styles.matchRightBox}>
+                      <div className={styles.matchSquare}>
+                        <span className={styles.matchNum}>
+                          {formatMatchRate(item.topMatchRate)}
+                        </span>
+                        <span className={styles.matchLabel}>
+                          MATCH
+                        </span>
+                      </div>
+
+                      <button
+                        type="button"
+                        className={styles.mapActionBtn}
+                        onClick={() => navigate('/map')}
+                      >
+                        <img
+                          src={mapIcon}
+                          alt="지도"
+                          className={styles.mapIcon}
+                        />
+                        <span>지도에서 보기</span>
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
           </div>
         </main>
       </div>

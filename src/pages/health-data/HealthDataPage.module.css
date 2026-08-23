@@ -172,6 +172,13 @@
   margin: 16px 0;
 }
 
+.outdatedNotice {
+  margin: 0 0 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-2);
+}
+
 .dataGrid {
   display: flex;
   flex-direction: column;
@@ -214,6 +221,12 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
 
 .formGroup {

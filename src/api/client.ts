@@ -1,10 +1,12 @@
+import { getAccessToken } from '@/utils/authSession'
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 export async function apiFetch<T>(
   endpoint: string,
   options?: RequestInit,
 ): Promise<T> {
-  const accessToken = localStorage.getItem('accessToken')
+  const accessToken = getAccessToken()
   const isFormData = options?.body instanceof FormData
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {

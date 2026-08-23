@@ -82,6 +82,13 @@
   color: var(--Sub-Color-4);
 }
 
+.searchButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 .searchIcon {
   width: 25px;
   height: 25px;
@@ -145,6 +152,22 @@
   width: 100%;
 }
 
+.status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 139px;
+  margin: 0;
+  padding: 20px;
+  color: var(--Sub-Color-3);
+  font-size: 14px;
+  text-align: center;
+}
+
+.error {
+  color: #d14343;
+}
+
 .mapArea {
   position: relative;
   width: 684px;
@@ -186,6 +209,19 @@
   width: 15px;
   height: 19px;
   flex-shrink: 0;
+}
+
+.mapStatus {
+  position: absolute;
+  top: 22px;
+  left: 22px;
+  max-width: 360px;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 90%);
+  color: var(--Sub-Color-3);
+  font-size: 12px;
 }
 
 .marker {

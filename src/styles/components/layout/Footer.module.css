@@ -1,4 +1,6 @@
 .footer {
+  width: 100%;
+  min-width: var(--layout-min-width);
   background: var(--Sub-Color-7);
 }
 
@@ -7,7 +9,6 @@
   flex-direction: column;
   gap: 18px;
   width: 100%;
-  min-width: var(--layout-min-width);
   max-width: calc(var(--layout-max-width) + var(--layout-side-padding) * 2);
   margin: 0 auto;
   padding: 0 var(--layout-side-padding) 36px;
