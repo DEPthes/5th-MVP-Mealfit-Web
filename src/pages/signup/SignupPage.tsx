@@ -1,5 +1,5 @@
-import { PagePlaceholder } from '@/components/common/PagePlaceholder'
+import { LoginPage } from '@/pages/login/LoginPage'
 
 export function SignupPage() {
-  return <PagePlaceholder title="회원가입" />
+  return <LoginPage initialMode="signup" />
 }

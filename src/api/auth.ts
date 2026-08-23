@@ -1,15 +1,20 @@
 import { apiFetch } from './client'
-import type { ApiResponse } from './types'
+import type {
+  ActivityLevel,
+  ApiResponse,
+  Gender,
+  Goal,
+} from './types'
 
 export interface SignupRequest {
   email: string
   password: string
   nickname: string
   height?: number
-  gender: 'MALE' | 'FEMALE'
+  gender: Gender
   birthDate: string
-  activityLevel: 'SEDENTARY' | 'LIGHT' | 'MODERATE' | 'ACTIVE'
-  goal: 'LOSS' | 'MAINTAIN' | 'GAIN'
+  activityLevel: ActivityLevel
+  goal: Goal
 }
 
 export interface LoginData {

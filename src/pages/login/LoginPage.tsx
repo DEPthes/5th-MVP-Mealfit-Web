@@ -1,49 +1,110 @@
-import { useState } from 'react'
+import { type FormEvent, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import styles from './LoginPage.module.css'
-import { login } from '@/api/auth'
+import { login, signup } from '@/api/auth'
+import type { ActivityLevel, Gender, Goal } from '@/api/types'
 
 type AuthMode = 'login' | 'signup' | 'reset'
 
-export function LoginPage() {
-  const [mode, setMode] = useState<AuthMode>('login')
+type LoginPageProps = {
+  initialMode?: AuthMode
+}
+
+export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
+  const navigate = useNavigate()
+  const [mode, setMode] = useState<AuthMode>(initialMode)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [name, setName] = useState('')
+  const [nickname, setNickname] = useState('')
+  const [height, setHeight] = useState('')
+  const [gender, setGender] = useState<Gender>('MALE')
+  const [birthDate, setBirthDate] = useState('')
+  const [activityLevel, setActivityLevel] =
+    useState<ActivityLevel>('SEDENTARY')
+  const [goal, setGoal] = useState<Goal>('MAINTAIN')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [message, setMessage] = useState('')
 
-  const handleSubmit = async () => {
-    if (mode === 'login') {
-      try {
-        const response = await login(email, password)
+  const changeMode = (nextMode: AuthMode) => {
+    setMode(nextMode)
+    setMessage('')
+  }
 
-        if (!response.data?.accessToken) {
-          throw new Error(
-            '로그인 응답에 accessToken이 없습니다.',
-          )
-        }
+  const saveLogin = async () => {
+    const response = await login(email, password)
 
-        console.log('로그인 성공:', response)
-
-        const accessToken = response.data.accessToken
-
-        localStorage.setItem('accessToken', accessToken)
-
-        console.log('accessToken 저장 완료')
-      } catch (error) {
-        console.error('로그인 실패:', error)
-      }
-
-      return
+    if (!response.success || !response.data?.accessToken) {
+      throw new Error(response.message || '로그인에 실패했습니다.')
     }
 
-    if (mode === 'signup') {
-      console.log('회원가입 UI - 아직 API 연결 전')
-      return
-    }
+    localStorage.setItem('accessToken', response.data.accessToken)
+    localStorage.setItem('memberId', String(response.data.memberId))
+    localStorage.setItem('nickname', response.data.nickname)
+  }
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setMessage('')
 
     if (mode === 'reset') {
-      console.log('비밀번호 재설정 UI - 아직 API 연결 전')
+      setMessage('비밀번호 재설정 API가 준비되지 않았습니다.')
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      if (mode === 'login') {
+        await saveLogin()
+        navigate('/')
+        return
+      }
+
+      const parsedHeight = height ? Number(height) : undefined
+
+      if (parsedHeight !== undefined && parsedHeight <= 0) {
+        throw new Error('키는 양수로 입력해 주세요.')
+      }
+
+      const response = await signup({
+        email,
+        password,
+        nickname: nickname.trim(),
+        height: parsedHeight,
+        gender,
+        birthDate,
+        activityLevel,
+        goal,
+      })
+
+      if (!response.success || response.data == null) {
+        throw new Error(response.message || '회원가입에 실패했습니다.')
+      }
+
+      await saveLogin()
+      navigate('/health-data')
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : mode === 'login'
+            ? '로그인에 실패했습니다.'
+            : '회원가입에 실패했습니다.',
+      )
+    } finally {
+      setIsSubmitting(false)
     }
   }
+
+  const isSignupValid =
+    nickname.trim() !== '' &&
+    birthDate !== '' &&
+    (!height || Number(height) > 0)
+
+  const isFormValid =
+    email.trim() !== '' &&
+    (mode === 'reset' || password !== '') &&
+    (mode !== 'signup' || isSignupValid)
 
   return (
     <div className={styles.container}>
@@ -70,7 +131,7 @@ export function LoginPage() {
             className={`${styles.tab} ${
               mode === 'login' ? styles.activeTab : ''
             }`}
-            onClick={() => setMode('login')}
+            onClick={() => changeMode('login')}
           >
             로그인
           </button>
@@ -80,7 +141,7 @@ export function LoginPage() {
             className={`${styles.tab} ${
               mode === 'signup' ? styles.activeTab : ''
             }`}
-            onClick={() => setMode('signup')}
+            onClick={() => changeMode('signup')}
           >
             회원가입
           </button>
@@ -88,50 +149,150 @@ export function LoginPage() {
       )}
 
       {/* 폼 영역 */}
-      <div className={styles.formCard}>
-        {/* 회원가입 시 이름 입력창 */}
+      <form className={styles.formCard} onSubmit={handleSubmit}>
+        {/* 회원가입 시 닉네임 입력창 */}
         {mode === 'signup' && (
           <div className={styles.inputGroup}>
-            <label className={styles.label}>이름</label>
+            <label className={styles.label} htmlFor="signup-nickname">
+              닉네임
+            </label>
 
             <input
+              id="signup-nickname"
               type="text"
               placeholder="홍길동"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={nickname}
+              onChange={(event) => setNickname(event.target.value)}
               className={styles.input}
+              required
             />
           </div>
         )}
 
         {/* 공통 이메일 입력창 */}
         <div className={styles.inputGroup}>
-          <label className={styles.label}>
+          <label className={styles.label} htmlFor="auth-email">
             이메일 (아이디)
           </label>
 
           <input
+            id="auth-email"
             type="email"
             placeholder="you@myongji.ac.kr"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(event) => setEmail(event.target.value)}
             className={styles.input}
+            required
           />
         </div>
 
         {/* 비밀번호 입력창 */}
         {mode !== 'reset' && (
           <div className={styles.inputGroup}>
-            <label className={styles.label}>비밀번호</label>
+            <label className={styles.label} htmlFor="auth-password">
+              비밀번호
+            </label>
 
             <input
+              id="auth-password"
               type="password"
               placeholder="********"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(event) => setPassword(event.target.value)}
               className={styles.input}
+              required
             />
           </div>
+        )}
+
+        {mode === 'signup' && (
+          <>
+            <div className={styles.inputRow}>
+              <div className={styles.inputGroup}>
+                <label className={styles.label} htmlFor="signup-birth-date">
+                  생년월일
+                </label>
+                <input
+                  id="signup-birth-date"
+                  type="date"
+                  value={birthDate}
+                  onChange={(event) => setBirthDate(event.target.value)}
+                  className={styles.input}
+                  required
+                />
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label className={styles.label} htmlFor="signup-gender">
+                  성별
+                </label>
+                <select
+                  id="signup-gender"
+                  value={gender}
+                  onChange={(event) =>
+                    setGender(event.target.value as Gender)
+                  }
+                  className={styles.input}
+                >
+                  <option value="MALE">남성</option>
+                  <option value="FEMALE">여성</option>
+                </select>
+              </div>
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.label} htmlFor="signup-height">
+                키 (cm, 선택)
+              </label>
+              <input
+                id="signup-height"
+                type="number"
+                min="0.1"
+                step="0.1"
+                placeholder="175.0"
+                value={height}
+                onChange={(event) => setHeight(event.target.value)}
+                className={styles.input}
+              />
+            </div>
+
+            <div className={styles.inputRow}>
+              <div className={styles.inputGroup}>
+                <label className={styles.label} htmlFor="signup-activity">
+                  활동량
+                </label>
+                <select
+                  id="signup-activity"
+                  value={activityLevel}
+                  onChange={(event) =>
+                    setActivityLevel(event.target.value as ActivityLevel)
+                  }
+                  className={styles.input}
+                >
+                  <option value="SEDENTARY">운동 거의 안 함</option>
+                  <option value="LIGHT">주 1~2회</option>
+                  <option value="MODERATE">주 3~4회</option>
+                  <option value="ACTIVE">주 5~6회</option>
+                </select>
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label className={styles.label} htmlFor="signup-goal">
+                  목표
+                </label>
+                <select
+                  id="signup-goal"
+                  value={goal}
+                  onChange={(event) => setGoal(event.target.value as Goal)}
+                  className={styles.input}
+                >
+                  <option value="LOSS">체중 감량</option>
+                  <option value="MAINTAIN">체중 유지</option>
+                  <option value="GAIN">근육량 증가</option>
+                </select>
+              </div>
+            </div>
+          </>
         )}
 
         {/* 로그인 모드일 때만 보이는 비밀번호 재설정 버튼 */}
@@ -139,28 +300,32 @@ export function LoginPage() {
           <button
             type="button"
             className={styles.linkText}
-            onClick={() => setMode('reset')}
+            onClick={() => changeMode('reset')}
           >
             비밀번호를 잊으셨나요?
           </button>
         )}
 
-        {/* 제출 버튼 */}
+        {message && (
+          <p className={styles.message} role="alert">
+            {message}
+          </p>
+        )}
+
         <button
-          type="button"
-          onClick={() => void handleSubmit()}
+          type="submit"
+          disabled={!isFormValid || isSubmitting}
           className={`${styles.submitBtn} ${
-            email &&
-            (mode === 'reset' || password)
-              ? styles.activeSubmitBtn
-              : ''
+            isFormValid && !isSubmitting ? styles.activeSubmitBtn : ''
           }`}
         >
-          {mode === 'login' && '로그인'}
-          {mode === 'signup' &&
-            '회원가입하고 시작하기'}
-          {mode === 'reset' &&
-            '비밀번호 재설정 이메일 받기'}
+          {isSubmitting
+            ? '처리 중...'
+            : mode === 'login'
+              ? '로그인'
+              : mode === 'signup'
+                ? '회원가입하고 시작하기'
+                : '비밀번호 재설정 이메일 받기'}
         </button>
 
         {/* 회원가입 안내 문구 */}
@@ -176,12 +341,12 @@ export function LoginPage() {
           <button
             type="button"
             className={styles.backToLogin}
-            onClick={() => setMode('login')}
+            onClick={() => changeMode('login')}
           >
             로그인 화면으로 돌아가기
           </button>
         )}
-      </div>
+      </form>
     </div>
   )
 }
