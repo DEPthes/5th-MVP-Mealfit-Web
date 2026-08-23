@@ -14,10 +14,9 @@
 }
 
 .pageWrapper {
-  width: 1440px;
-  min-width: 1440px;
+  width: 100%;
   margin: 0 auto;
-  padding: 0 60px 100px;
+  padding: 0 0 30px;
   box-sizing: border-box;
 }
 
@@ -30,17 +29,17 @@
 
 .contentContainer {
   display: flex;
-  gap: 32px;
+  gap: 56px;
   align-items: flex-start;
 }
 
 .leftBoard {
-  width: 470px;
+  width: 553px;
   flex-shrink: 0;
   background-color: var(--color-white);
   border: 1px solid var(--color-border);
-  border-radius: 16px;
-  padding: 28px;
+  border-radius: 12px;
+  padding: 24px 30px;
   box-sizing: border-box;
 }
 
@@ -179,15 +178,16 @@
 
 .targetGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  grid-template-columns: 231px 231px;
+  gap: 21px;
   margin-top: 12px;
   margin-bottom: 12px;
 }
 
 .targetCard {
+  width: 231px;
   background-color: var(--color-primary-bg);
-  border-radius: 12px;
+  border-radius: 5px;
   padding: 18px 20px;
 }
 
@@ -256,7 +256,7 @@
 }
 
 .rightBoard {
-  width: 590px;
+  width: 592px;
   flex-shrink: 0;
 }
 
