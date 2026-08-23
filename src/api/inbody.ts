@@ -11,8 +11,8 @@ export interface InbodyResponse {
   inbodyScore: number
   measuredAt: string
   uploadedAt: string
-  stale?: boolean
-  imagePath?: string
+  stale: boolean
+  imagePath: string
 }
 
 export interface InbodyHistoryItem extends Omit<

@@ -291,6 +291,9 @@ export function HealthDataPage() {
                 <div className={styles.uploadStatusRow}>
                   <span className={styles.statusText}>
                     인식 완료 — {inbodyData.measuredAt}
+                    {inbodyData.stale
+                      ? ' · 측정일이 오래되어 갱신이 필요합니다.'
+                      : ''}
                   </span>
 
                   <button

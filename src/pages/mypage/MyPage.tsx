@@ -1,5 +1,9 @@
 import { type FormEvent, useEffect, useState } from 'react'
 import {
+  getInbodyHistory,
+  type InbodyHistoryItem,
+} from '@/api/inbody'
+import {
   getMyProfile,
   type MemberProfile,
   updateMyProfile,
@@ -43,6 +47,9 @@ export function MyPage() {
     useState<ActivityLevel>('SEDENTARY')
   const [goal, setGoal] = useState<Goal>('MAINTAIN')
   const [diseases, setDiseases] = useState<Disease[]>([])
+  const [inbodyHistory, setInbodyHistory] = useState<InbodyHistoryItem[]>(
+    [],
+  )
 
   const applyProfile = (member: MemberProfile) => {
     setProfile(member)
@@ -79,6 +86,18 @@ export function MyPage() {
 
         if (!ignore) {
           applyProfile(response.data)
+        }
+
+        try {
+          const historyResponse = await getInbodyHistory()
+
+          if (!ignore && historyResponse.success && historyResponse.data) {
+            setInbodyHistory(historyResponse.data)
+          }
+        } catch {
+          if (!ignore) {
+            setInbodyHistory([])
+          }
         }
       } catch (error) {
         if (!ignore) {
@@ -400,9 +419,27 @@ export function MyPage() {
 
           <div className={styles.inbodyHistoryCard}>
             <h3 className={styles.cardTitle}>인바디 업로드 이력</h3>
-            <p className={styles.emptyText}>
-              인바디 이력은 건강 데이터 입력 화면에서 확인할 수 있습니다.
-            </p>
+            {inbodyHistory.length === 0 ? (
+              <p className={styles.emptyText}>
+                업로드한 인바디 이력이 없습니다.
+              </p>
+            ) : (
+              <div className={styles.fileList}>
+                {inbodyHistory.map((item) => (
+                  <div key={item.inbodyId} className={styles.fileRow}>
+                    <span className={styles.fileName}>
+                      {item.originalFilename}
+                    </span>
+                    <span className={styles.fileStatus}>
+                      {item.measuredAt}
+                      {item.proteinTarget != null
+                        ? ` · 목표 단백질 ${item.proteinTarget}g`
+                        : ''}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

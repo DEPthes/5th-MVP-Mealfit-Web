@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import styles from './HomePage.module.css'
 import mapIcon from '@/assets/icons/map.svg'
 import uploadIcon from '@/assets/icons/share.svg'
@@ -100,6 +101,7 @@ const diseaseLabels: Record<string, string> = {
 }
 
 export function HomePage() {
+  const navigate = useNavigate()
   const [selectedFilter, setSelectedFilter] = useState('1만원 이하')
 
   const [inbodyData, setInbodyData] =
@@ -202,11 +204,19 @@ export function HomePage() {
           <div className={styles.inbodyNoticeCard}>
             <p className={styles.inbodyText}>
               {inbodyData ? (
-                <>
-                  최신 인바디 데이터가 반영되어 있어요.
-                  <br />
-                  새로 업로드하면 더 정확해져요.
-                </>
+                inbodyData.stale ? (
+                  <>
+                    측정일이 오래되어 갱신이 필요해요.
+                    <br />
+                    인바디를 다시 업로드해 주세요.
+                  </>
+                ) : (
+                  <>
+                    최신 인바디 데이터가 반영되어 있어요.
+                    <br />
+                    새로 업로드하면 더 정확해져요.
+                  </>
+                )
               ) : (
                 <>
                   아직 인바디 데이터가 없어요.
@@ -219,6 +229,7 @@ export function HomePage() {
             <button
               type="button"
               className={styles.uploadBtn}
+              onClick={() => navigate('/health-data')}
             >
               업로드
               <img
