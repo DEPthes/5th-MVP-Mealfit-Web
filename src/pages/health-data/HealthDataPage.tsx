@@ -406,6 +406,13 @@ export function HealthDataPage() {
                     하루·한 끼 목표 영양치를 계산합니다.
                   </p>
 
+                  {targetData?.outdated && (
+                    <p className={styles.outdatedNotice}>
+                      인바디나 프로필이 바뀌어 목표 영양치가
+                      오래되었습니다. 아래에서 다시 저장하면 갱신됩니다.
+                    </p>
+                  )}
+
                   <div className={styles.dataGrid}>
                     <div className={styles.dataRow}>
                       <span className={styles.dataLabel}>

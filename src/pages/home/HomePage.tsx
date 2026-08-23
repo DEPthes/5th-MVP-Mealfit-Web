@@ -10,12 +10,15 @@ import {
 } from '@/api/inbody'
 import {
   getMyTargets,
+  getScoreHistory,
+  type ScoreHistoryItem,
   type TargetResponse,
 } from '@/api/analysis'
 import {
   getMyProfile,
   type MemberProfile,
 } from '@/api/member'
+import { ScoreTrendChart } from '@/components/charts/ScoreTrendChart'
 
 const filters = [
   '1만원 이하',
@@ -113,6 +116,10 @@ export function HomePage() {
   const [profile, setProfile] =
     useState<MemberProfile | null>(null)
 
+  const [scoreHistory, setScoreHistory] = useState<
+    ScoreHistoryItem[]
+  >([])
+
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -151,6 +158,21 @@ export function HomePage() {
           }
         } catch (error) {
           console.info('목표 영양치가 없습니다.', error)
+        }
+
+        // 인바디 점수 추이
+        try {
+          const response = await getScoreHistory()
+
+          if (response.data) {
+            setScoreHistory(
+              [...response.data].sort((a, b) =>
+                a.measuredAt.localeCompare(b.measuredAt),
+              ),
+            )
+          }
+        } catch (error) {
+          console.info('점수 이력이 없습니다.', error)
         }
       } finally {
         setIsLoading(false)
@@ -251,89 +273,16 @@ export function HomePage() {
             </div>
 
             <div className={styles.graphBox}>
-              <svg
+              <ScoreTrendChart
+                items={scoreHistory}
                 className={styles.chartSvg}
-                viewBox="0 0 320 140"
-              >
-                <line
-                  x1="30"
-                  y1="20"
-                  x2="310"
-                  y2="20"
-                  className={styles.chartGrid}
-                />
-                <text
-                  x="5"
-                  y="24"
-                  className={styles.chartYText}
-                >
-                  70
-                </text>
-
-                <line
-                  x1="30"
-                  y1="50"
-                  x2="310"
-                  y2="50"
-                  className={styles.chartGrid}
-                />
-                <text
-                  x="5"
-                  y="54"
-                  className={styles.chartYText}
-                >
-                  50
-                </text>
-
-                <line
-                  x1="30"
-                  y1="80"
-                  x2="310"
-                  y2="80"
-                  className={styles.chartGrid}
-                />
-                <text
-                  x="5"
-                  y="84"
-                  className={styles.chartYText}
-                >
-                  30
-                </text>
-
-                <line
-                  x1="30"
-                  y1="110"
-                  x2="310"
-                  y2="110"
-                  className={styles.chartGrid}
-                />
-                <text
-                  x="5"
-                  y="114"
-                  className={styles.chartYText}
-                >
-                  10
-                </text>
-
-                {inbodyData?.inbodyScore != null && (
-                  <>
-                    <circle
-                      cx="170"
-                      cy="80"
-                      r="4"
-                      className={styles.chartPoint}
-                    />
-
-                    <text
-                      x="160"
-                      y="132"
-                      className={styles.chartXText}
-                    >
-                      최근
-                    </text>
-                  </>
-                )}
-              </svg>
+                emptyClassName={styles.chartEmpty}
+                gridClassName={styles.chartGrid}
+                lineClassName={styles.chartLine}
+                pointClassName={styles.chartPoint}
+                yTextClassName={styles.chartYText}
+                xTextClassName={styles.chartXText}
+              />
             </div>
           </div>
 
@@ -351,6 +300,14 @@ export function HomePage() {
               체중·골격근량·기초대사량과 목표·활동량 기반으로
               계산돼요.
             </div>
+
+            {targetData?.outdated && (
+              <p className={styles.outdatedNotice}>
+                인바디나 프로필이 바뀌어 목표 영양치가
+                오래되었습니다. 건강 데이터에서 다시 저장하면
+                갱신됩니다.
+              </p>
+            )}
 
             <div className={styles.targetGrid}>
               <div className={styles.targetCard}>
@@ -434,6 +391,7 @@ export function HomePage() {
             <button
               type="button"
               className={styles.reportBtn}
+              onClick={() => navigate('/ai-report')}
             >
               AI 영양 리포트 자세히 보기
             </button>
