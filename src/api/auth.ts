@@ -52,6 +52,31 @@ export async function signup(
   })
 }
 
+export async function requestPasswordReset(
+  email: string,
+): Promise<ApiResponse<string>> {
+  return apiFetch<ApiResponse<string>>(
+    '/api/members/password/reset-request',
+    {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    },
+  )
+}
+
+export async function resetPassword(
+  token: string,
+  newPassword: string,
+): Promise<ApiResponse<string>> {
+  return apiFetch<ApiResponse<string>>('/api/members/password/reset', {
+    method: 'POST',
+    body: JSON.stringify({
+      token,
+      newPassword,
+    }),
+  })
+}
+
 export async function login(
   email: string,
   password: string,
