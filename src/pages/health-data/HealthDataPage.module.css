@@ -216,6 +216,12 @@
   gap: 24px;
 }
 
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
 .formGroup {
   display: flex;
   flex-direction: column;

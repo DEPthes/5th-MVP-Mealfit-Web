@@ -35,3 +35,8 @@ export function getAccessToken() {
 export function getStoredNickname() {
   return localStorage.getItem(NICKNAME_KEY)
 }
+
+export function updateStoredNickname(nickname: string) {
+  localStorage.setItem(NICKNAME_KEY, nickname)
+  notifyAuthSessionChange()
+}
