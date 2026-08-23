@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import styles from './LoginPage.module.css'
 import { login, signup } from '@/api/auth'
 import type { ActivityLevel, Gender, Goal } from '@/api/types'
+import { saveAuthSession } from '@/utils/authSession'
 
 type AuthMode = 'login' | 'signup' | 'reset'
 
@@ -37,9 +38,7 @@ export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
       throw new Error(response.message || '로그인에 실패했습니다.')
     }
 
-    localStorage.setItem('accessToken', response.data.accessToken)
-    localStorage.setItem('memberId', String(response.data.memberId))
-    localStorage.setItem('nickname', response.data.nickname)
+    saveAuthSession(response.data)
   }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
