@@ -1,6 +1,18 @@
 import { getAccessToken } from '@/utils/authSession'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+const CONFIGURED_API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? ''
+
+function getApiBaseUrl() {
+  if (
+    typeof window !== 'undefined' &&
+    window.location.protocol === 'https:' &&
+    CONFIGURED_API_BASE_URL.startsWith('http://')
+  ) {
+    return ''
+  }
+
+  return CONFIGURED_API_BASE_URL
+}
 
 export async function apiFetch<T>(
   endpoint: string,
@@ -9,7 +21,7 @@ export async function apiFetch<T>(
   const accessToken = getAccessToken()
   const isFormData = options?.body instanceof FormData
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const response = await fetch(`${getApiBaseUrl()}${endpoint}`, {
     ...options,
     headers: {
       // FormData는 브라우저가 boundary를 포함한 Content-Type을 자동으로 설정해야 함
