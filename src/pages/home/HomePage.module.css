@@ -375,6 +375,13 @@
   gap: 20px;
 }
 
+.foodStatus {
+  margin: 0;
+  padding: 24px 8px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
 .foodCard {
   position: relative;
   width: 590px;
