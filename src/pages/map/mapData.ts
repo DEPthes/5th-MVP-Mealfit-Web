@@ -1,42 +1,69 @@
-export const FOOD_TYPES = ['한식', '중식', '일식', '양식'] as const
+import type { Cuisine, FoodType } from '@/api/types'
+import type { RecommendationItem } from '@/api/recommendation'
 
-export const DETAIL_TYPES = ['전체', '고기', '면', '밥', '찌개·국', '분식'] as const
+export const CUISINE_FILTERS: ReadonlyArray<{
+  label: string
+  value: Cuisine
+}> = [
+  { label: '한식', value: 'KOREAN' },
+  { label: '중식', value: 'CHINESE' },
+  { label: '일식', value: 'JAPANESE' },
+  { label: '양식', value: 'WESTERN' },
+]
 
-export type Restaurant = {
-  id: string
-  name: string
-  distance: string
-  match: string
-  detail: string
+export const FOOD_TYPE_FILTERS: ReadonlyArray<{
+  label: string
+  value?: FoodType
+}> = [
+  { label: '전체' },
+  { label: '고기', value: 'MEAT' },
+  { label: '면', value: 'NOODLE' },
+  { label: '밥', value: 'RICE' },
+  { label: '찌개·국', value: 'SOUP' },
+  { label: '분식', value: 'SNACK' },
+]
+
+export function formatMatchRate(rate?: number | null) {
+  if (rate == null) {
+    return '--'
+  }
+
+  return `${rate.toFixed(1).replace(/\.0$/, '')}%`
 }
 
-export const RESTAURANTS: Restaurant[] = [
-  {
-    id: '1',
-    name: '베가보쌈',
-    distance: '서울 서대문구 명지대 정류장 기준 150m',
-    match: '00%',
-    detail: '보쌈정식 · 단백질 28g · 하루 목표(109g)의 26% 충족 · 9,500원 · 도보 2분',
-  },
-  {
-    id: '2',
-    name: '한술식당',
-    distance: '서울 서대문구 명지대 정류장 기준 300m',
-    match: '00%',
-    detail: '연어덮밥 · 단백질 34g · 하루 목표(109g)의 31% 충족 · 11,000원 · 도보 4분',
-  },
-  {
-    id: '3',
-    name: '그린테이블',
-    distance: '서울 서대문구 명지대 정류장 기준 340m',
-    match: '00%',
-    detail: '닭가슴살 샐러드볼 · 단백질 30g · 하루 목표(109g)의 28% 충족 · 8,500원 · 도보 5분',
-  },
-  {
-    id: '4',
-    name: '명지식당',
-    distance: '서울 서대문구 명지대 정류장 기준 90m',
-    match: '00%',
-    detail: '순두부찌개 · 100g당 단백질 6g · 7,000원 · 도보 1분',
-  },
-]
+export function formatDistance(item: RecommendationItem) {
+  if (item.distanceMeters == null) {
+    return `${item.distanceBasis} 기준 거리 정보 없음`
+  }
+
+  return `${item.distanceBasis} 기준 ${item.distanceMeters}m`
+}
+
+export function formatRecommendationDetail(item: RecommendationItem) {
+  const recommendation = item.menus[0]
+
+  if (!recommendation) {
+    return '조건에 맞는 메뉴 정보가 없습니다.'
+  }
+
+  const { menu, proteinTargetPercent } = recommendation
+  const details = [menu.menuName]
+
+  if (menu.nutrition?.protein != null) {
+    details.push(`단백질 ${menu.nutrition.protein}g`)
+  }
+
+  if (proteinTargetPercent != null) {
+    details.push(`하루 목표의 ${proteinTargetPercent}% 충족`)
+  }
+
+  if (menu.price != null) {
+    details.push(`${menu.price.toLocaleString()}원`)
+  }
+
+  if (item.walkingMinutes != null) {
+    details.push(`도보 ${item.walkingMinutes}분`)
+  }
+
+  return details.join(' · ')
+}

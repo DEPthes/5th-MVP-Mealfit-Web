@@ -1,18 +1,25 @@
-import type { Restaurant } from './mapData'
+import type { RecommendationItem } from '@/api/recommendation'
 import { MatchBadge } from '@/components/common/MatchBadge'
+import {
+  formatDistance,
+  formatMatchRate,
+  formatRecommendationDetail,
+} from './mapData'
 import styles from '@/styles/pages/map/RestaurantCard.module.css'
 
 type RestaurantCardProps = {
-  restaurant: Restaurant
+  recommendation: RecommendationItem
   selected?: boolean
   onClick?: () => void
 }
 
 export function RestaurantCard({
-  restaurant,
+  recommendation,
   selected = false,
   onClick,
 }: RestaurantCardProps) {
+  const { restaurant, topMatchRate } = recommendation
+
   return (
     <button
       type="button"
@@ -22,12 +29,14 @@ export function RestaurantCard({
       <div className={styles.top}>
         <div className={styles.info}>
           <p className={styles.name}>{restaurant.name}</p>
-          <p className={styles.distance}>{restaurant.distance}</p>
+          <p className={styles.distance}>{formatDistance(recommendation)}</p>
         </div>
-        <MatchBadge percent={restaurant.match} size="sm" />
+        <MatchBadge percent={formatMatchRate(topMatchRate)} size="sm" />
       </div>
       <div className={styles.divider} />
-      <p className={styles.detail}>{restaurant.detail}</p>
+      <p className={styles.detail}>
+        {formatRecommendationDetail(recommendation)}
+      </p>
     </button>
   )
 }
