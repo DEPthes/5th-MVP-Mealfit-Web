@@ -55,6 +55,7 @@
   color: #666;
   text-align: center;
   white-space: nowrap;
+  cursor: default;
 }
 
 .linkPrivacy {
