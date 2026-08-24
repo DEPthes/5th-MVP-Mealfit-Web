@@ -6,14 +6,24 @@ import {
   requestPasswordReset,
   signup,
 } from '@/api/auth'
-import type { ActivityLevel, Gender, Goal } from '@/api/types'
 import { saveAuthSession } from '@/utils/authSession'
 import resetLinkIcon from '@/assets/icons/reset-link.svg'
 
 type AuthMode = 'login' | 'signup' | 'reset'
 
+// 이메일 유효성 및 30자 이내 검증
 function isValidEmail(value: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
+  const trimmed = value.trim()
+  return trimmed.length <= 30 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)
+}
+
+// 비밀번호 8~30자, 영문 대문자, 소문자, 특수문자 각 1자 이상 포함 검증
+function isValidPassword(value: string) {
+  if (value.length < 8 || value.length > 30) return false
+  const hasUpperCase = /[A-Z]/.test(value)
+  const hasLowerCase = /[a-z]/.test(value)
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value)
+  return hasUpperCase && hasLowerCase && hasSpecialChar
 }
 
 type LoginPageProps = {
@@ -30,16 +40,11 @@ export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
     typeof location.state.from === 'string'
       ? location.state.from
       : '/'
+
   const [mode, setMode] = useState<AuthMode>(initialMode)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [nickname, setNickname] = useState('')
-  const [height, setHeight] = useState('')
-  const [gender, setGender] = useState<Gender>('MALE')
-  const [birthDate, setBirthDate] = useState('')
-  const [activityLevel, setActivityLevel] =
-    useState<ActivityLevel>('SEDENTARY')
-  const [goal, setGoal] = useState<Goal>('MAINTAIN')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState('')
   const [isSuccess, setIsSuccess] = useState(false)
@@ -54,7 +59,7 @@ export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
     const response = await login(email, password)
 
     if (!response.success || !response.data?.accessToken) {
-      throw new Error(response.message || '로그인에 실패했습니다.')
+      throw new Error(response.message || '아이디 또는 비밀번호가 올바르지 않습니다.')
     }
 
     saveAuthSession(response.data)
@@ -64,7 +69,6 @@ export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
     event.preventDefault()
     setMessage('')
     setIsSuccess(false)
-
     setIsSubmitting(true)
 
     try {
@@ -87,21 +91,15 @@ export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
         return
       }
 
-      const parsedHeight = height ? Number(height) : undefined
-
-      if (parsedHeight !== undefined && parsedHeight <= 0) {
-        throw new Error('키는 양수로 입력해 주세요.')
-      }
-
+      // 회원가입 제출
       const response = await signup({
-        email,
+        email: email.trim(),
         password,
         nickname: nickname.trim(),
-        height: parsedHeight,
-        gender,
-        birthDate,
-        activityLevel,
-        goal,
+        gender: 'MALE',
+        birthDate: '2000-01-01',
+        activityLevel: 'SEDENTARY',
+        goal: 'MAINTAIN',
       })
 
       if (!response.success || response.data == null) {
@@ -114,342 +112,208 @@ export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
       setMessage(
         error instanceof Error
           ? error.message
-          : mode === 'login'
-            ? '로그인에 실패했습니다.'
-            : mode === 'reset'
-              ? '비밀번호 재설정에 실패했습니다.'
-              : '회원가입에 실패했습니다.',
+          : '요청 처리 중 오류가 발생했습니다.',
       )
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  const isSignupValid =
-    nickname.trim() !== '' &&
-    birthDate !== '' &&
-    (!height || Number(height) > 0)
-
+  // 폼 유효성 조건
   const isFormValid =
     mode === 'reset'
       ? isValidEmail(email)
-      : email.trim() !== '' &&
-        password !== '' &&
-        (mode !== 'signup' || isSignupValid)
+      : mode === 'signup'
+        ? nickname.trim() !== '' && isValidEmail(email) && isValidPassword(password)
+        : isValidEmail(email) && password !== ''
+
+  const getTitle = () => {
+    if (mode === 'reset') return '비밀번호 재설정'
+    if (mode === 'signup') return '회원가입'
+    return '로그인'
+  }
+
+  const getSubTitle = () => {
+    if (mode === 'reset') {
+      return '가입할 때 사용한 이메일을 입력하시면, 비밀번호 재설정 링크를 보내드려요.'
+    }
+    return '사용자는 이메일과 비밀번호로 회원가입 후 로그인하여 서비스를 이용합니다. 로그인 시 JWT 기반 인증 토큰이 발급됩니다.'
+  }
 
   return (
-    <div
-      className={`${styles.container} ${
-        mode === 'reset' ? styles.resetPage : ''
-      }`}
-    >
-      {/* 상단 타이틀 */}
-      <div
-        className={
-          mode === 'reset' ? styles.resetTitleGroup : styles.titleGroup
-        }
-      >
-        <h1 className={mode === 'reset' ? styles.resetTitle : styles.title}>
-          {mode === 'reset'
-            ? '비밀번호 재설정'
-            : '로그인 / 회원가입'}
-        </h1>
+    <div className={styles.container}>
+      <div className={styles.contentWrapper}>
+        <div className={styles.titleGroup}>
+          <h1 className={styles.title}>{getTitle()}</h1>
+          <p className={styles.subTitle}>{getSubTitle()}</p>
+        </div>
 
-        <p
-          className={
-            mode === 'reset' ? styles.resetSubTitle : styles.subTitle
-          }
-        >
-          {mode === 'reset'
-            ? '가입할 때 사용한 이메일을 입력하시면, 비밀번호 재설정 링크를 보내드려요.'
-            : '사용자는 이메일과 비밀번호로 회원가입 후 로그인하여 서비스를 이용합니다. 로그인 시 JWT 기반 인증 토큰이 발급됩니다.'}
-        </p>
-      </div>
-
-      {mode === 'reset' && isSuccess && (
-        <div className={styles.sentCard}>
-          <div className={styles.sentContent}>
-            <span className={styles.sentIcon}>
-              <span className={styles.sentIconInner}>
+        {mode === 'reset' && isSuccess ? (
+          <div className={styles.sentCard}>
+            <div className={styles.sentContent}>
+              <div className={styles.sentIcon}>
                 <img
                   src={resetLinkIcon}
-                  alt=""
-                  className={styles.sentIconLeaf}
-                  width={43.6029}
-                  height={43.562}
+                  alt="전송 완료"
+                  width={43.6}
+                  height={43.5}
                 />
-              </span>
-            </span>
-            <div className={styles.sentText}>
-              <p className={styles.sentHeading}>재설정 링크를 보냈어요</p>
-              <p className={styles.sentDesc}>
-                입력한 이메일로 비밀번호 재설정 링크를 전송했습니다.
-              </p>
+              </div>
+              <div className={styles.sentText}>
+                <p className={styles.sentHeading}>재설정 링크를 보냈어요</p>
+                <p className={styles.sentDesc}>
+                  입력한 이메일로 비밀번호 재설정 링크를 전송했습니다.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* 로그인/회원가입 탭 */}
-      {mode !== 'reset' && (
-        <div className={styles.tabGroup}>
-          <button
-            type="button"
-            className={`${styles.tab} ${
-              mode === 'login' ? styles.activeTab : ''
+        ) : (
+          <form
+            className={`${styles.formCard} ${
+              mode === 'login'
+                ? styles.loginFormCard
+                : mode === 'signup'
+                  ? styles.signupFormCard
+                  : styles.resetFormCard
             }`}
-            onClick={() => changeMode('login')}
+            onSubmit={handleSubmit}
           >
-            로그인
-          </button>
+            <div className={styles.formBody}>
+              {mode === 'signup' && (
+                <div className={styles.inputGroup}>
+                  <label className={styles.label} htmlFor="signup-nickname">
+                    이름
+                  </label>
+                  <input
+                    id="signup-nickname"
+                    type="text"
+                    placeholder="홍길동"
+                    value={nickname}
+                    onChange={(e) => setNickname(e.target.value)}
+                    className={styles.input}
+                    required
+                  />
+                </div>
+              )}
 
-          <button
-            type="button"
-            className={`${styles.tab} ${
-              mode === 'signup' ? styles.activeTab : ''
-            }`}
-            onClick={() => changeMode('signup')}
-          >
-            회원가입
-          </button>
-        </div>
-      )}
-
-      {/* 폼 영역 */}
-      {!(mode === 'reset' && isSuccess) && (
-      <form
-        className={`${styles.formCard} ${
-          mode === 'reset' ? styles.resetFormCard : ''
-        }`}
-        onSubmit={handleSubmit}
-      >
-        {/* 회원가입 시 닉네임 입력창 */}
-        {mode === 'signup' && (
-          <div className={styles.inputGroup}>
-            <label className={styles.label} htmlFor="signup-nickname">
-              닉네임
-            </label>
-
-            <input
-              id="signup-nickname"
-              type="text"
-              placeholder="홍길동"
-              value={nickname}
-              onChange={(event) => setNickname(event.target.value)}
-              className={styles.input}
-              required
-            />
-          </div>
-        )}
-
-        {mode === 'reset' && (
-          <div className={`${styles.inputGroup} ${styles.resetInputGroup}`}>
-            <label className={`${styles.label} ${styles.resetLabel}`} htmlFor="reset-email">
-              이메일 (아이디)
-            </label>
-            <input
-              id="reset-email"
-              type="email"
-              placeholder="you@myongji.ac.kr"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              className={`${styles.input} ${styles.resetInput}`}
-              required
-            />
-          </div>
-        )}
-
-        {mode !== 'reset' && (
-        <div className={styles.inputGroup}>
-          <label className={styles.label} htmlFor="auth-email">
-            이메일 (아이디)
-          </label>
-
-          <input
-            id="auth-email"
-            type="email"
-            placeholder="you@myongji.ac.kr"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            className={styles.input}
-            required
-          />
-        </div>
-        )}
-
-        {/* 비밀번호 입력창 */}
-        {mode !== 'reset' && (
-          <div className={styles.inputGroup}>
-            <label className={styles.label} htmlFor="auth-password">
-              비밀번호
-            </label>
-
-            <input
-              id="auth-password"
-              type="password"
-              placeholder="********"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className={styles.input}
-              required
-            />
-          </div>
-        )}
-
-        {mode === 'signup' && (
-          <>
-            <div className={styles.inputRow}>
               <div className={styles.inputGroup}>
-                <label className={styles.label} htmlFor="signup-birth-date">
-                  생년월일
+                <label className={styles.label} htmlFor="auth-email">
+                  이메일 (아이디)
                 </label>
                 <input
-                  id="signup-birth-date"
-                  type="date"
-                  value={birthDate}
-                  onChange={(event) => setBirthDate(event.target.value)}
+                  id="auth-email"
+                  type="email"
+                  maxLength={30}
+                  placeholder="you@myongji.ac.kr"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className={styles.input}
                   required
                 />
+                {mode === 'signup' && (
+                  <span className={styles.inputHelp}>
+                    30자 이내로 입력해 주세요.
+                  </span>
+                )}
               </div>
 
-              <div className={styles.inputGroup}>
-                <label className={styles.label} htmlFor="signup-gender">
-                  성별
-                </label>
-                <select
-                  id="signup-gender"
-                  value={gender}
-                  onChange={(event) =>
-                    setGender(event.target.value as Gender)
-                  }
-                  className={styles.input}
-                >
-                  <option value="MALE">남성</option>
-                  <option value="FEMALE">여성</option>
-                </select>
-              </div>
+              {mode !== 'reset' && (
+                <div className={styles.inputGroup}>
+                  <label className={styles.label} htmlFor="auth-password">
+                    비밀번호
+                  </label>
+                  <input
+                    id="auth-password"
+                    type="password"
+                    maxLength={30}
+                    placeholder={
+                      mode === 'signup'
+                        ? '8~30자, 대/소문자+특수문자 포함'
+                        : '********'
+                    }
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={styles.input}
+                    required
+                  />
+                  {mode === 'signup' && (
+                    <span className={styles.inputHelp}>
+                      영문 대문자·소문자·특수문자를 각 1자 이상 포함해 8~30자로 입력해 주세요.
+                    </span>
+                  )}
+                  {mode === 'login' && (
+                    <button
+                      type="button"
+                      className={styles.forgotLink}
+                      onClick={() => changeMode('reset')}
+                    >
+                      비밀번호를 잊으셨나요?
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
-            <div className={styles.inputGroup}>
-              <label className={styles.label} htmlFor="signup-height">
-                키 (cm, 선택)
-              </label>
-              <input
-                id="signup-height"
-                type="number"
-                min="0.1"
-                step="0.1"
-                placeholder="175.0"
-                value={height}
-                onChange={(event) => setHeight(event.target.value)}
-                className={styles.input}
-              />
-            </div>
+            {message && (
+              <p
+                className={isSuccess ? styles.successMessage : styles.message}
+                role="alert"
+              >
+                {message}
+              </p>
+            )}
 
-            <div className={styles.inputRow}>
-              <div className={styles.inputGroup}>
-                <label className={styles.label} htmlFor="signup-activity">
-                  활동량
-                </label>
-                <select
-                  id="signup-activity"
-                  value={activityLevel}
-                  onChange={(event) =>
-                    setActivityLevel(event.target.value as ActivityLevel)
-                  }
-                  className={styles.input}
+            <div className={styles.actionGroup}>
+              <button
+                type="submit"
+                disabled={!isFormValid || isSubmitting}
+                className={`${styles.submitBtn} ${
+                  isFormValid && !isSubmitting ? styles.activeSubmitBtn : ''
+                }`}
+              >
+                {isSubmitting
+                  ? '처리 중...'
+                  : mode === 'signup'
+                    ? '회원가입하고 시작하기'
+                    : mode === 'reset'
+                      ? '재설정 링크 보내기'
+                      : '로그인'}
+              </button>
+
+              {mode === 'login' && (
+                <div className={styles.footerRow}>
+                  <span>계정이 필요한가요?</span>
+                  <button
+                    type="button"
+                    className={styles.switchLink}
+                    onClick={() => changeMode('signup')}
+                  >
+                    회원가입
+                  </button>
+                </div>
+              )}
+
+              {mode === 'signup' && (
+                <div className={styles.footerRow}>
+                  <span className={styles.inputHelp}>
+                    가입 직후에는 건강 데이터 입력 화면으로 먼저 이동해요.
+                  </span>
+                </div>
+              )}
+
+              {mode === 'reset' && (
+                <button
+                  type="button"
+                  className={styles.resetBackLink}
+                  onClick={() => changeMode('login')}
                 >
-                  <option value="SEDENTARY">운동 거의 안 함</option>
-                  <option value="LIGHT">주 1~2회</option>
-                  <option value="MODERATE">주 3~4회</option>
-                  <option value="ACTIVE">주 5~6회</option>
-                </select>
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label className={styles.label} htmlFor="signup-goal">
-                  목표
-                </label>
-                <select
-                  id="signup-goal"
-                  value={goal}
-                  onChange={(event) => setGoal(event.target.value as Goal)}
-                  className={styles.input}
-                >
-                  <option value="LOSS">체중 감량</option>
-                  <option value="MAINTAIN">체중 유지</option>
-                  <option value="GAIN">근육량 증가</option>
-                </select>
-              </div>
+                  로그인으로 돌아가기
+                </button>
+              )}
             </div>
-          </>
+          </form>
         )}
-
-        {/* 로그인 모드일 때만 보이는 비밀번호 재설정 버튼 */}
-        {mode === 'login' && (
-          <button
-            type="button"
-            className={styles.linkText}
-            onClick={() => changeMode('reset')}
-          >
-            비밀번호를 잊으셨나요?
-          </button>
-        )}
-
-        {message && (
-          <p
-            className={isSuccess ? styles.successMessage : styles.message}
-            role="alert"
-          >
-            {message}
-          </p>
-        )}
-
-        {mode === 'reset' ? (
-          <div className={styles.resetActions}>
-            <button
-              type="submit"
-              disabled={!isFormValid || isSubmitting}
-              className={`${styles.submitBtn} ${styles.resetSubmitBtn} ${
-                isFormValid && !isSubmitting ? styles.activeSubmitBtn : ''
-              }`}
-            >
-              {isSubmitting ? '처리 중...' : '재설정 링크 보내기'}
-            </button>
-            <button
-              type="button"
-              className={styles.resetBackLink}
-              onClick={() => changeMode('login')}
-            >
-              로그인으로 돌아가기
-            </button>
-          </div>
-        ) : (
-          <button
-            type="submit"
-            disabled={!isFormValid || isSubmitting}
-            className={`${styles.submitBtn} ${
-              isFormValid && !isSubmitting ? styles.activeSubmitBtn : ''
-            }`}
-          >
-            {isSubmitting
-              ? '처리 중...'
-              : mode === 'signup'
-                ? '회원가입하고 시작하기'
-                : '로그인'}
-          </button>
-        )}
-
-        {/* 회원가입 안내 문구 */}
-        {mode === 'signup' && (
-          <p className={styles.footerHint}>
-            가입 직후에는 건강 데이터 입력 화면으로 먼저
-            이동해요.
-          </p>
-        )}
-      </form>
-      )}
+      </div>
     </div>
   )
 }

@@ -4,209 +4,189 @@
   align-items: center;
   justify-content: center;
   padding: 60px 20px;
-  background-color: #ffffff;
+  background-color: transparent;
+  width: 100%;
 }
 
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 590px;
+  margin: 0 auto;
+  gap: 24px;
+}
+
+
 .titleGroup {
-  text-align: center;
-  margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
 }
 
 .title {
-  font-size: 24px;
-  font-weight: 700;
-  color: #161a1b;
-  margin-bottom: 8px;
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--Sub-Color, #161a1b);
+  line-height: 1;
 }
 
 .subTitle {
-  font-size: 13px;
-  color: #6a6e71;
-  line-height: 1.5;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--Sub-Color-2, #383a3e);
+  line-height: 1.4;
 }
 
-.tabGroup {
-  display: flex;
-  width: 482px;
-  margin-bottom: 20px;
-}
-
-.tab {
-  flex: 1;
-  height: 48px;
-  border: 1px solid #e1e2e4;
-  background-color: #ffffff;
-  color: #6a6e71;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.activeTab {
-  background-color: #161a1b;
-  color: #ffffff;
-  border-color: #161a1b;
-}
 
 .formCard {
-  width: 482px;
-  border: 1px solid #e1e2e4;
-  border-radius: 8px;
-  padding: 32px 24px;
+  width: 100%;
+  max-width: 590px;
+  background: var(--Main-Color, #ffffff);
+  border: 1px solid var(--Point-Color-1, #00d4ac);
+  border-radius: 5px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
   box-sizing: border-box;
+}
+
+
+.loginFormCard {
+  height: 399px;
+  padding: 36px 46px;
+  justify-content: space-between;
+}
+
+
+.signupFormCard {
+  height: 530px;
+  padding: 35px 46px;
+  justify-content: space-between;
+}
+
+
+.resetFormCard {
+  height: 269px;
+  padding: 35px 46px;
+  justify-content: space-between;
+}
+
+
+.formBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
 }
 
 .inputGroup {
   display: flex;
   flex-direction: column;
   gap: 8px;
-}
-
-.inputRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  width: 100%;
 }
 
 .label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #161a1b;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--Sub-Color, #161a1b);
 }
 
 .input {
+  width: 100%;
   height: 50px;
   padding: 0 16px;
   border: 1px solid #e1e2e4;
-  border-radius: 6px;
-  background-color: #f3f3f3;
+  border-radius: 5px;
+  background-color: var(--Sub-Color-7, #f3f3f3);
   font-size: 14px;
+  color: #161a1b;
   outline: none;
   box-sizing: border-box;
 }
 
+.input::placeholder {
+  color: #a0a4a8;
+}
+
 .input:focus {
-  border-color: #00d4ac;
+  border-color: var(--Point-Color-1, #00d4ac);
   background-color: #ffffff;
 }
 
-select.input {
+.inputHelp {
+  font-size: 11px;
+  color: var(--Sub-Color-3, #6a6e71);
+  margin-top: 2px;
+}
+
+
+.forgotLink {
+  align-self: flex-start;
+  font-size: 12px;
+  color: var(--Point-Color-1, #00d4ac);
+  background: none;
+  border: none;
+  padding: 0;
   cursor: pointer;
+  text-decoration: underline;
+}
+
+
+.actionGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
 }
 
 .submitBtn {
+  width: 100%;
   height: 48px;
-  background-color: #161a1b;
+  background-color: var(--Sub-Color-2, #383a3e);
   color: #ffffff;
   border: none;
-  border-radius: 6px;
-  font-size: 15px;
-  font-weight: 600;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 700;
   cursor: pointer;
-  margin-top: 8px;
   transition: background-color 0.2s ease;
 }
 
 .activeSubmitBtn {
-  background-color: #00d4ac;
-  color: #161a1b;
+  background-color: var(--Point-Color-1, #00d4ac);
+  color: var(--Sub-Color, #161a1b);
 }
 
 .submitBtn:disabled {
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: 0.8;
 }
 
-.message {
-  margin: 0;
-  color: #d14343;
-  font-size: 13px;
-  line-height: 1.5;
-  text-align: center;
-}
 
-.successMessage {
-  margin: 0;
-  color: #1a7f64;
-  font-size: 13px;
-  line-height: 1.5;
-  text-align: center;
-}
-
-.linkText {
-  align-self: flex-end;
+.footerRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   font-size: 12px;
-  color: #00d4ac;
-  cursor: pointer;
-  text-decoration: underline;
+  color: var(--Sub-Color-3, #6a6e71);
+}
+
+.switchLink {
+  color: var(--Point-Color-1, #00d4ac);
   background: none;
   border: none;
   padding: 0;
-}
-
-.footerHint {
-  text-align: center;
-  font-size: 12px;
-  color: #6a6e71;
-  margin-top: 8px;
-}
-
-.resetFormCard {
-  width: 100%;
-  height: 269px;
-  padding: 35px 46px;
-  border: 1px solid var(--Point-Color-1);
-  border-radius: 5px;
-  gap: 40px;
-  background: var(--Main-Color);
-  justify-content: center;
-}
-
-.resetInputGroup {
-  gap: 15px;
-  width: 100%;
-}
-
-.resetLabel {
-  font-size: 18px;
+  cursor: pointer;
   font-weight: 600;
-  line-height: 1;
-}
-
-.resetInput {
-  width: 100%;
-  border-radius: 5px;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.resetInput::placeholder {
-  color: var(--Sub-Color-4);
-}
-
-.resetActions {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  width: 100%;
-}
-
-.resetSubmitBtn {
-  width: 100%;
-  margin-top: 0;
-  background-color: var(--Sub-Color-3);
-  color: var(--Sub-Color-7);
-  font-size: 18px;
-  border-radius: 5px;
-}
-
-.resetSubmitBtn.activeSubmitBtn {
-  background-color: var(--Point-Color-1);
-  color: var(--Sub-Color);
+  text-decoration: underline;
 }
 
 .resetBackLink {
@@ -216,9 +196,9 @@ select.input {
   height: 14px;
   padding: 2px 0;
   border: none;
-  border-bottom: 0.8px solid var(--Point-Color-1);
+  border-bottom: 0.8px solid var(--Point-Color-1, #00d4ac);
   background: none;
-  color: var(--Point-Color-1);
+  color: var(--Point-Color-1, #00d4ac);
   font-size: 12px;
   font-weight: 600;
   line-height: 1;
@@ -226,50 +206,17 @@ select.input {
   white-space: nowrap;
 }
 
-.resetPage {
-  align-items: flex-start;
-  justify-content: flex-start;
-  width: 590px;
-  margin: 0 auto;
-  padding: 94px 0 0;
-  background: transparent;
-  gap: 40px;
-}
-
-.resetTitleGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-  text-align: left;
-  margin-bottom: 0;
-}
-
-.resetTitle {
-  margin: 0;
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--Sub-Color);
-  line-height: 1;
-}
-
-.resetSubTitle {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 400;
-  color: var(--Sub-Color-2);
-  line-height: 1;
-}
 
 .sentCard {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
+  max-width: 590px;
   height: 295px;
   padding: 69px 115px 74px 114px;
-  background: var(--Main-Color);
-  border: 1px solid var(--Point-Color-1);
+  background: var(--Main-Color, #ffffff);
+  border: 1px solid var(--Point-Color-1, #00d4ac);
   border-radius: 5px;
   box-sizing: border-box;
 }
@@ -278,40 +225,23 @@ select.input {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 30px;
+  gap: 24px;
   width: 345px;
 }
 
 .sentIcon {
-  position: relative;
-  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 49px;
   height: 49px;
-  overflow: hidden;
-}
-
-.sentIconInner {
-  position: absolute;
-  top: 8.61%;
-  right: 8.57%;
-  bottom: 8.61%;
-  left: 8.57%;
-}
-
-.sentIconLeaf {
-  position: absolute;
-  top: -3.7%;
-  left: -3.69%;
-  width: 43.6029px;
-  height: 43.562px;
-  max-width: none;
 }
 
 .sentText {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 28px;
+  gap: 12px;
   width: 100%;
 }
 
@@ -326,9 +256,23 @@ select.input {
 
 .sentDesc {
   margin: 0;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 400;
-  color: var(--Sub-Color-3);
-  line-height: 1;
-  white-space: nowrap;
+  color: var(--Sub-Color-3, #6a6e71);
+  line-height: 1.3;
+  text-align: center;
+}
+
+.message {
+  margin: 0;
+  color: #d14343;
+  font-size: 13px;
+  text-align: center;
+}
+
+.successMessage {
+  margin: 0;
+  color: #1a7f64;
+  font-size: 13px;
+  text-align: center;
 }
