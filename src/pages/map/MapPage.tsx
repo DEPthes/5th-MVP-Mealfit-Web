@@ -1,40 +1,66 @@
-import { type FormEvent, useEffect, useState } from 'react'
+import { type FormEvent, useEffect, useRef, useState } from 'react'
+
 import {
   getRecommendations,
   type RecommendationItem,
 } from '@/api/recommendation'
-import { getRestaurant, type RestaurantDetailResponse } from '@/api/restaurant'
+import {
+  getRestaurant,
+  type RestaurantDetailResponse,
+} from '@/api/restaurant'
 import type { Cuisine, FoodType } from '@/api/types'
+
 import magnifierIcon from '@/assets/icons/magnifier.svg'
 import locationPinIcon from '@/assets/icons/location-pin.svg'
 import locationSearchIcon from '@/assets/icons/location-search.svg'
+
 import { Tag } from '@/components/common/Tag'
+
 import { RestaurantCard } from './RestaurantCard'
-import { CUISINE_FILTERS, FOOD_TYPE_FILTERS, formatDistance } from './mapData'
+
 import {
-  getKakaoRouteUrl,
-  getOsmEmbedUrl,
-  getRestaurantCoords,
-} from './mapLocation'
+  CUISINE_FILTERS,
+  FOOD_TYPE_FILTERS,
+  formatDistance,
+} from './mapData'
+
+import { getKakaoRouteUrl, getRestaurantCoords } from './mapLocation'
+
+import { loadKakaoMap } from './kakaoLoader'
+
 import styles from '@/styles/pages/map/MapPage.module.css'
 
 export function MapPage() {
   const [draftKeyword, setDraftKeyword] = useState('')
   const [keyword, setKeyword] = useState('')
+
   const [cuisine, setCuisine] = useState<Cuisine>('JAPANESE')
   const [foodType, setFoodType] = useState<FoodType | undefined>('MEAT')
-  const [recommendations, setRecommendations] = useState<RecommendationItem[]>(
-    [],
-  )
+
+  const [recommendations, setRecommendations] = useState<
+    RecommendationItem[]
+  >([])
+
   const [selectedId, setSelectedId] = useState<number | null>(null)
+
   const [selectedDetail, setSelectedDetail] =
     useState<RestaurantDetailResponse | null>(null)
+
   const [isLoading, setIsLoading] = useState(true)
   const [isDetailLoading, setIsDetailLoading] = useState(false)
+
   const [errorMessage, setErrorMessage] = useState('')
   const [detailErrorMessage, setDetailErrorMessage] = useState('')
+
+  const [mapErrorMessage, setMapErrorMessage] = useState('')
+
   const [refreshKey, setRefreshKey] = useState(0)
 
+  const mapContainerRef = useRef<HTMLDivElement | null>(null)
+
+  /*
+   * 식당 추천 목록 가져오기
+   */
   useEffect(() => {
     let ignore = false
 
@@ -61,7 +87,9 @@ export function MapPage() {
         }
 
         const items = response.data.content
+
         setRecommendations(items)
+
         setSelectedId((currentId) => {
           const hasCurrentItem = items.some(
             (item) => item.restaurant.restaurantId === currentId,
@@ -78,6 +106,7 @@ export function MapPage() {
 
         setRecommendations([])
         setSelectedId(null)
+
         setErrorMessage(
           error instanceof Error
             ? error.message
@@ -97,6 +126,9 @@ export function MapPage() {
     }
   }, [cuisine, foodType, keyword, refreshKey])
 
+  /*
+   * 선택한 식당 상세 정보 가져오기
+   */
   useEffect(() => {
     let ignore = false
 
@@ -121,6 +153,7 @@ export function MapPage() {
       } catch (error) {
         if (!ignore) {
           setSelectedDetail(null)
+
           setDetailErrorMessage(
             error instanceof Error
               ? error.message
@@ -141,19 +174,105 @@ export function MapPage() {
     }
   }, [selectedId])
 
+  /*
+   * 선택된 추천 식당
+   */
   const selectedRecommendation =
     recommendations.find(
       (item) => item.restaurant.restaurantId === selectedId,
     ) ?? null
 
+  /*
+   * 선택된 식당
+   */
   const selectedRestaurant =
     selectedDetail?.restaurant.restaurantId === selectedId
       ? selectedDetail.restaurant
       : (selectedRecommendation?.restaurant ?? null)
+
+  /*
+   * 식당의 위도 / 경도
+   */
   const selectedCoords = getRestaurantCoords(selectedRestaurant)
 
+  /*
+   * 카카오 지도 초기화
+   */
+  useEffect(() => {
+    const container = mapContainerRef.current
+
+    if (!container || !selectedCoords) {
+      return
+    }
+
+    let cancelled = false
+   let marker: KakaoMarker | null = null
+
+    const initializeMap = async () => {
+      try {
+        setMapErrorMessage('')
+
+        await loadKakaoMap()
+
+        if (cancelled || !mapContainerRef.current) {
+          return
+        }
+
+        const kakaoMaps = window.kakao?.maps
+
+        if (!kakaoMaps) {
+          throw new Error('카카오 지도 SDK를 불러오지 못했습니다.')
+        }
+
+        const position = new kakaoMaps.LatLng(
+          selectedCoords.latitude,
+          selectedCoords.longitude,
+        )
+
+        const map = new kakaoMaps.Map(mapContainerRef.current, {
+          center: position,
+          level: 4,
+        })
+
+        marker = new kakaoMaps.Marker({
+          map,
+          position,
+          title: selectedRestaurant?.name ?? '선택한 식당',
+        })
+      } catch (error) {
+        if (!cancelled) {
+          setMapErrorMessage(
+            error instanceof Error
+              ? error.message
+              : '카카오 지도를 불러오지 못했습니다.',
+          )
+        }
+      }
+    }
+
+    void initializeMap()
+
+    return () => {
+      cancelled = true
+
+      if (marker) {
+        marker.setMap(null)
+      }
+
+      container.innerHTML = ''
+    }
+  }, [
+    selectedCoords?.latitude,
+    selectedCoords?.longitude,
+    selectedRestaurant?.name,
+  ])
+
+  /*
+   * 검색
+   */
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
     setKeyword(draftKeyword.trim())
   }
 
@@ -161,6 +280,7 @@ export function MapPage() {
     <section className={styles.page}>
       <header className={styles.pageHeader}>
         <h1 className={styles.title}>식당 검색 · 지도</h1>
+
         <p className={styles.description}>
           카테고리를 선택해가며 명지대 주변 식당을 좁혀서 찾고, 선택한 식당의
           위치와 방문 경로를 확인할 수 있습니다.
@@ -175,11 +295,12 @@ export function MapPage() {
             <input
               className={styles.searchInput}
               type="search"
-              placeholder="검색 식당명  또는 메뉴 검색(예: 보쌈, 연어덮밥)"
+              placeholder="검색 식당명 또는 메뉴 검색(예: 보쌈, 연어덮밥)"
               aria-label="식당명 또는 메뉴 검색"
               value={draftKeyword}
               onChange={(event) => setDraftKeyword(event.target.value)}
             />
+
             <button
               type="submit"
               className={styles.searchButton}
@@ -198,8 +319,10 @@ export function MapPage() {
           <div className={styles.filters}>
             <div className={styles.filterGroup}>
               <p className={styles.filterTitle}>
-                1. 음식 종류 <span className={styles.required}>(필수)</span>
+                1. 음식 종류{' '}
+                <span className={styles.required}>(필수)</span>
               </p>
+
               <div className={styles.tags}>
                 {CUISINE_FILTERS.map((filter) => (
                   <Tag
@@ -214,6 +337,7 @@ export function MapPage() {
 
             <div className={styles.filterGroup}>
               <p className={styles.filterTitleStrong}>2. 세부 종류</p>
+
               <div className={styles.tags}>
                 {FOOD_TYPE_FILTERS.map((filter) => (
                   <Tag
@@ -231,19 +355,26 @@ export function MapPage() {
             {isLoading && recommendations.length === 0 && (
               <p className={styles.status}>식당을 불러오는 중입니다.</p>
             )}
+
             {!isLoading && errorMessage && (
               <p className={`${styles.status} ${styles.error}`} role="alert">
                 {errorMessage}
               </p>
             )}
-            {!isLoading && !errorMessage && recommendations.length === 0 && (
-              <p className={styles.status}>조건에 맞는 식당이 없습니다.</p>
-            )}
+
+            {!isLoading &&
+              !errorMessage &&
+              recommendations.length === 0 && (
+                <p className={styles.status}>조건에 맞는 식당이 없습니다.</p>
+              )}
+
             {recommendations.map((recommendation) => (
               <RestaurantCard
                 key={recommendation.restaurant.restaurantId}
                 recommendation={recommendation}
-                selected={selectedId === recommendation.restaurant.restaurantId}
+                selected={
+                  selectedId === recommendation.restaurant.restaurantId
+                }
                 onClick={() =>
                   setSelectedId(recommendation.restaurant.restaurantId)
                 }
@@ -254,16 +385,25 @@ export function MapPage() {
 
         <div className={styles.mapArea}>
           {selectedCoords ? (
-            <iframe
+            <div
+              ref={mapContainerRef}
               className={styles.mapFrame}
-              title={`${selectedRestaurant?.name ?? '선택한 식당'} 위치`}
-              src={getOsmEmbedUrl(
-                selectedCoords.latitude,
-                selectedCoords.longitude,
-              )}
+              aria-label="카카오 지도"
             />
           ) : (
-            <div className={styles.mapPlaceholder} aria-label="지도 영역" />
+            <div
+              className={styles.mapPlaceholder}
+              aria-label="지도 영역"
+            />
+          )}
+
+          {mapErrorMessage && (
+            <div
+              className={`${styles.mapStatus} ${styles.error}`}
+              role="alert"
+            >
+              {mapErrorMessage}
+            </div>
           )}
 
           <button
@@ -272,6 +412,7 @@ export function MapPage() {
             onClick={() => setRefreshKey((current) => current + 1)}
           >
             <span>이 위치에서 검색</span>
+
             <img
               src={locationSearchIcon}
               alt=""
@@ -290,18 +431,25 @@ export function MapPage() {
                   className={styles.markerPinImg}
                 />
               </div>
-              <p className={styles.markerLabel}>{selectedRestaurant.name}</p>
+
+              <p className={styles.markerLabel}>
+                {selectedRestaurant.name}
+              </p>
             </div>
           )}
 
           {selectedRestaurant && selectedRecommendation && (
             <div className={styles.mapCard}>
               <div className={styles.mapCardInfo}>
-                <p className={styles.mapCardName}>{selectedRestaurant.name}</p>
+                <p className={styles.mapCardName}>
+                  {selectedRestaurant.name}
+                </p>
+
                 <p className={styles.mapCardDistance}>
                   {formatDistance(selectedRecommendation)}
                 </p>
               </div>
+
               <button
                 type="button"
                 className={styles.routeButton}
@@ -327,16 +475,18 @@ export function MapPage() {
             </div>
           )}
 
-          {selectedId !== null && (isDetailLoading || detailErrorMessage) && (
-            <p
-              className={`${styles.mapStatus} ${
-                detailErrorMessage ? styles.error : ''
-              }`}
-              role={detailErrorMessage ? 'alert' : 'status'}
-            >
-              {detailErrorMessage || '식당 상세 정보를 불러오는 중입니다.'}
-            </p>
-          )}
+          {selectedId !== null &&
+            (isDetailLoading || detailErrorMessage) && (
+              <p
+                className={`${styles.mapStatus} ${
+                  detailErrorMessage ? styles.error : ''
+                }`}
+                role={detailErrorMessage ? 'alert' : 'status'}
+              >
+                {detailErrorMessage ||
+                  '식당 상세 정보를 불러오는 중입니다.'}
+              </p>
+            )}
         </div>
       </div>
     </section>
