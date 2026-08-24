@@ -186,11 +186,16 @@
 
 .mapFrame {
   display: block;
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+  isolation: isolate;
   border: 0;
 }
 
 .searchHere {
   position: absolute;
+  z-index: 2;
   top: 22px;
   right: 22px;
   display: inline-flex;
@@ -219,6 +224,7 @@
 
 .mapStatus {
   position: absolute;
+  z-index: 2;
   top: 22px;
   left: 22px;
   max-width: 360px;
@@ -232,6 +238,7 @@
 
 .marker {
   position: absolute;
+  z-index: 2;
   top: 427px;
   left: 388px;
   display: flex;
@@ -272,6 +279,7 @@
 
 .mapCard {
   position: absolute;
+  z-index: 2;
   left: 22px;
   right: 22px;
   bottom: 22px;
