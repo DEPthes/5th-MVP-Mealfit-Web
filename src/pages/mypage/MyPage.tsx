@@ -8,12 +8,16 @@ import {
   type MemberProfile,
   updateMyProfile,
 } from '@/api/member'
+import {
+  getRecommendations,
+  type RecommendationItem,
+} from '@/api/recommendation'
 import type { ActivityLevel, Disease, Goal } from '@/api/types'
 import { updateStoredNickname } from '@/utils/authSession'
 import styles from './MyPage.module.css'
 
 const activityLabels: Record<ActivityLevel, string> = {
-  SEDENTARY: '운동 거의 안 함',
+  SEDENTARY: '주 0~0회 · 보통 강도',
   LIGHT: '주 1~2회',
   MODERATE: '주 3~4회',
   ACTIVE: '주 5~6회',
@@ -22,7 +26,7 @@ const activityLabels: Record<ActivityLevel, string> = {
 const goalLabels: Record<Goal, string> = {
   LOSS: '체중 감량',
   MAINTAIN: '체중 유지',
-  GAIN: '근육량 증가',
+  GAIN: '근육량 증가 +0kg',
 }
 
 const diseaseOptions: ReadonlyArray<{
@@ -34,6 +38,18 @@ const diseaseOptions: ReadonlyArray<{
   { value: 'DIABETES', label: '당뇨' },
   { value: 'HYPERLIPIDEMIA', label: '고지혈증' },
 ]
+
+// 날짜 포맷 변환 함수 (YYYY.MM.DD)
+const formatDate = (dateString?: string) => {
+  if (!dateString) return '2026.00.00'
+  const date = new Date(dateString)
+  if (isNaN(date.getTime())) return dateString
+
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}.${month}.${day}`
+}
 
 export function MyPage() {
   const [profile, setProfile] = useState<MemberProfile | null>(null)
@@ -47,9 +63,8 @@ export function MyPage() {
     useState<ActivityLevel>('SEDENTARY')
   const [goal, setGoal] = useState<Goal>('MAINTAIN')
   const [diseases, setDiseases] = useState<Disease[]>([])
-  const [inbodyHistory, setInbodyHistory] = useState<InbodyHistoryItem[]>(
-    [],
-  )
+  const [inbodyHistory, setInbodyHistory] = useState<InbodyHistoryItem[]>([])
+  const [recommendations, setRecommendations] = useState<RecommendationItem[]>([])
 
   const applyProfile = (member: MemberProfile) => {
     setProfile(member)
@@ -74,7 +89,7 @@ export function MyPage() {
   useEffect(() => {
     let ignore = false
 
-    const loadProfile = async () => {
+    const loadData = async () => {
       setIsLoading(true)
 
       try {
@@ -90,14 +105,20 @@ export function MyPage() {
 
         try {
           const historyResponse = await getInbodyHistory()
-
           if (!ignore && historyResponse.success && historyResponse.data) {
             setInbodyHistory(historyResponse.data)
           }
         } catch {
-          if (!ignore) {
-            setInbodyHistory([])
+          if (!ignore) setInbodyHistory([])
+        }
+
+        try {
+          const recResponse = await getRecommendations()
+          if (!ignore && recResponse.success && recResponse.data?.content) {
+            setRecommendations(recResponse.data.content)
           }
+        } catch {
+          if (!ignore) setRecommendations([])
         }
       } catch (error) {
         if (!ignore) {
@@ -114,7 +135,7 @@ export function MyPage() {
       }
     }
 
-    void loadProfile()
+    void loadData()
 
     return () => {
       ignore = true
@@ -207,6 +228,18 @@ export function MyPage() {
           .join(', ')
       : '없음'
 
+  const latestInbodyScore =
+    inbodyHistory.length > 0 && inbodyHistory[0].inbodyScore != null
+      ? `${inbodyHistory[0].inbodyScore}점`
+      : '00점'
+
+  const recentInbodyDate =
+    inbodyHistory.length > 0
+      ? formatDate(inbodyHistory[0].measuredAt)
+      : '-'
+
+  const joinedDate = formatDate((profile as { createdAt?: string }).createdAt)
+
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.container}>
@@ -214,7 +247,7 @@ export function MyPage() {
           <div className={styles.titleSection}>
             <h1 className={styles.pageTitle}>마이페이지</h1>
             <p className={styles.pageDesc}>
-              회원정보와 건강 스펙을 조회하고 수정할 수 있습니다.
+              회원정보, 건강 스펙, 추천 이력을 조회하고 수정할 수 있습니다.
             </p>
           </div>
 
@@ -242,37 +275,57 @@ export function MyPage() {
 
           <div className={styles.statsRow}>
             <div className={styles.statBox}>
-              <div className={styles.statValue}>
-                {profile.hasTarget ? '산출 완료' : '미산출'}
-              </div>
-              <div className={styles.statLabel}>목표 영양치</div>
+              <div className={styles.statValue}>{latestInbodyScore}</div>
+              <div className={styles.statLabel}>인바디 점수</div>
             </div>
             <div className={styles.statBox}>
-              <div className={styles.statValue}>
-                {profile.height != null ? `${profile.height}cm` : '-'}
-              </div>
-              <div className={styles.statLabel}>키</div>
+              <div className={styles.statValue}>{inbodyHistory.length}</div>
+              <div className={styles.statLabel}>인바디 업로드</div>
             </div>
             <div className={styles.statBox}>
-              <div className={styles.statValue}>{profile.birthDate}</div>
-              <div className={styles.statLabel}>생년월일</div>
+              <div className={styles.statValue}>{joinedDate}</div>
+              <div className={styles.statLabel}>가입일</div>
             </div>
           </div>
 
           <div className={styles.historyCard}>
-            <h3 className={styles.cardTitle}>회원 정보</h3>
-            <div className={styles.infoList}>
-              <div className={styles.infoRow}>
-                <span className={styles.infoLabel}>회원 번호</span>
-                <span className={styles.infoValue}>{profile.memberId}</span>
-              </div>
-              <div className={styles.infoRow}>
-                <span className={styles.infoLabel}>성별</span>
-                <span className={styles.infoValue}>
-                  {profile.gender === 'MALE' ? '남성' : '여성'}
-                </span>
-              </div>
-            </div>
+            <h3 className={styles.cardTitle}>추천 이력</h3>
+            {recommendations.length === 0 ? (
+              <p className={styles.emptyText}>추천 이력이 없습니다.</p>
+            ) : (
+              <ul className={styles.historyList}>
+                {recommendations.map((item, index) => {
+                  // 안전한 속성 접근 처리
+                  const menuItem = item.menus?.[0] as any
+                  const restaurantItem = item.restaurant as any
+
+                  const menuName =
+                    menuItem?.menu?.name ||
+                    menuItem?.menu?.menuName ||
+                    restaurantItem?.name ||
+                    '추천 메뉴'
+
+                  const itemId =
+                    restaurantItem?.id ||
+                    restaurantItem?.restaurantId ||
+                    index
+
+                  return (
+                    <li key={itemId} className={styles.historyItem}>
+                      <div className={styles.historyName}>
+                        <span className={styles.historyNum}>
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <span>{menuName}</span>
+                      </div>
+                      <button type="button" className={styles.detailBtn}>
+                        상세보기
+                      </button>
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
           </div>
         </div>
 
@@ -386,6 +439,10 @@ export function MyPage() {
               <>
                 <div className={styles.infoList}>
                   <div className={styles.infoRow}>
+                    <span className={styles.infoLabel}>최근 인바디 업로드</span>
+                    <span className={styles.infoValue}>{recentInbodyDate}</span>
+                  </div>
+                  <div className={styles.infoRow}>
                     <span className={styles.infoLabel}>목표</span>
                     <span className={styles.infoValue}>
                       {goalLabels[profile.goal]}
@@ -430,12 +487,7 @@ export function MyPage() {
                     <span className={styles.fileName}>
                       {item.originalFilename}
                     </span>
-                    <span className={styles.fileStatus}>
-                      {item.measuredAt}
-                      {item.proteinTarget != null
-                        ? ` · 목표 단백질 ${item.proteinTarget}g`
-                        : ''}
-                    </span>
+                    <span className={styles.fileStatus}>인식완료</span>
                   </div>
                 ))}
               </div>
