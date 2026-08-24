@@ -2,7 +2,6 @@ import { type FormEvent, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import styles from './LoginPage.module.css'
 import {
-  DEMO_ACCOUNT,
   login,
   requestPasswordReset,
   signup,
@@ -163,13 +162,8 @@ export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
         >
           {mode === 'reset'
             ? '가입할 때 사용한 이메일을 입력하시면, 비밀번호 재설정 링크를 보내드려요.'
-            : '사용자는 이메일과 비밀번호로 회원가입 후 로그인하여 서비스를 이용합니다.'}
+            : '사용자는 이메일과 비밀번호로 회원가입 후 로그인하여 서비스를 이용합니다. 로그인 시 JWT 기반 인증 토큰이 발급됩니다.'}
         </p>
-        {mode === 'login' && (
-          <p className={styles.subTitle}>
-            임시 계정: {DEMO_ACCOUNT.email} / {DEMO_ACCOUNT.password}
-          </p>
-        )}
       </div>
 
       {mode === 'reset' && isSuccess && (
