@@ -39,6 +39,18 @@ const diseaseOptions: ReadonlyArray<{
   { value: 'HYPERLIPIDEMIA', label: '고지혈증' },
 ]
 
+// 날짜 포맷 변환 함수 (YYYY.MM.DD)
+const formatDate = (dateString?: string) => {
+  if (!dateString) return '2026.00.00'
+  const date = new Date(dateString)
+  if (isNaN(date.getTime())) return dateString
+
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}.${month}.${day}`
+}
+
 export function MyPage() {
   const [profile, setProfile] = useState<MemberProfile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -223,8 +235,10 @@ export function MyPage() {
 
   const recentInbodyDate =
     inbodyHistory.length > 0
-      ? inbodyHistory[0].measuredAt
+      ? formatDate(inbodyHistory[0].measuredAt)
       : '-'
+
+  const joinedDate = formatDate((profile as { createdAt?: string }).createdAt)
 
   return (
     <div className={styles.pageWrapper}>
@@ -269,7 +283,7 @@ export function MyPage() {
               <div className={styles.statLabel}>인바디 업로드</div>
             </div>
             <div className={styles.statBox}>
-              <div className={styles.statValue}>{profile.birthDate || '-'}</div>
+              <div className={styles.statValue}>{joinedDate}</div>
               <div className={styles.statLabel}>가입일</div>
             </div>
           </div>
@@ -281,16 +295,23 @@ export function MyPage() {
             ) : (
               <ul className={styles.historyList}>
                 {recommendations.map((item, index) => {
+                  // 안전한 속성 접근 처리
+                  const menuItem = item.menus?.[0] as any
+                  const restaurantItem = item.restaurant as any
+
                   const menuName =
-                    item.menus[0]?.menu?.name ||
-                    item.restaurant?.name ||
+                    menuItem?.menu?.name ||
+                    menuItem?.menu?.menuName ||
+                    restaurantItem?.name ||
                     '추천 메뉴'
 
+                  const itemId =
+                    restaurantItem?.id ||
+                    restaurantItem?.restaurantId ||
+                    index
+
                   return (
-                    <li
-                      key={item.restaurant?.id || index}
-                      className={styles.historyItem}
-                    >
+                    <li key={itemId} className={styles.historyItem}>
                       <div className={styles.historyName}>
                         <span className={styles.historyNum}>
                           {String(index + 1).padStart(2, '0')}
