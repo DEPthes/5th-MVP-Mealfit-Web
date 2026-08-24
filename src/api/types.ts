@@ -78,6 +78,8 @@ export interface RestaurantResponse {
   name: string
   address: string
   cuisine: Cuisine
+  latitude?: number | null
+  longitude?: number | null
   distanceToMainGate?: number | null
   distanceToBackGate?: number | null
 }
