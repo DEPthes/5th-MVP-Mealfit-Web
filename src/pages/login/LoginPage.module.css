@@ -128,6 +128,14 @@ select.input {
   text-align: center;
 }
 
+.successMessage {
+  margin: 0;
+  color: #1a7f64;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+}
+
 .linkText {
   align-self: flex-end;
   font-size: 12px;
@@ -146,13 +154,181 @@ select.input {
   margin-top: 8px;
 }
 
-.backToLogin {
-  text-align: center;
-  font-size: 13px;
-  color: #6a6e71;
-  cursor: pointer;
-  margin-top: 12px;
-  text-decoration: underline;
-  background: none;
+.resetFormCard {
+  width: 100%;
+  height: 269px;
+  padding: 35px 46px;
+  border: 1px solid var(--Point-Color-1);
+  border-radius: 5px;
+  gap: 40px;
+  background: var(--Main-Color);
+  justify-content: center;
+}
+
+.resetInputGroup {
+  gap: 15px;
+  width: 100%;
+}
+
+.resetLabel {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.resetInput {
+  width: 100%;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.resetInput::placeholder {
+  color: var(--Sub-Color-4);
+}
+
+.resetActions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+
+.resetSubmitBtn {
+  width: 100%;
+  margin-top: 0;
+  background-color: var(--Sub-Color-3);
+  color: var(--Sub-Color-7);
+  font-size: 18px;
+  border-radius: 5px;
+}
+
+.resetSubmitBtn.activeSubmitBtn {
+  background-color: var(--Point-Color-1);
+  color: var(--Sub-Color);
+}
+
+.resetBackLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 14px;
+  padding: 2px 0;
   border: none;
+  border-bottom: 0.8px solid var(--Point-Color-1);
+  background: none;
+  color: var(--Point-Color-1);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.resetPage {
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 590px;
+  margin: 0 auto;
+  padding: 94px 0 0;
+  background: transparent;
+  gap: 40px;
+}
+
+.resetTitleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  margin-bottom: 0;
+}
+
+.resetTitle {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--Sub-Color);
+  line-height: 1;
+}
+
+.resetSubTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--Sub-Color-2);
+  line-height: 1;
+}
+
+.sentCard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 295px;
+  padding: 69px 115px 74px 114px;
+  background: var(--Main-Color);
+  border: 1px solid var(--Point-Color-1);
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.sentContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  width: 345px;
+}
+
+.sentIcon {
+  position: relative;
+  flex-shrink: 0;
+  width: 49px;
+  height: 49px;
+  overflow: hidden;
+}
+
+.sentIconInner {
+  position: absolute;
+  top: 8.61%;
+  right: 8.57%;
+  bottom: 8.61%;
+  left: 8.57%;
+}
+
+.sentIconLeaf {
+  position: absolute;
+  top: -3.7%;
+  left: -3.69%;
+  width: 43.6029px;
+  height: 43.562px;
+  max-width: none;
+}
+
+.sentText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  width: 100%;
+}
+
+.sentHeading {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #000000;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.sentDesc {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--Sub-Color-3);
+  line-height: 1;
+  white-space: nowrap;
 }

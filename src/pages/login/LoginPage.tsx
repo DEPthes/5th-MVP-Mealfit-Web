@@ -1,11 +1,20 @@
 import { type FormEvent, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import styles from './LoginPage.module.css'
-import { DEMO_ACCOUNT, login, signup } from '@/api/auth'
+import {
+  login,
+  requestPasswordReset,
+  signup,
+} from '@/api/auth'
 import type { ActivityLevel, Gender, Goal } from '@/api/types'
 import { saveAuthSession } from '@/utils/authSession'
+import resetLinkIcon from '@/assets/icons/reset-link.svg'
 
 type AuthMode = 'login' | 'signup' | 'reset'
+
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
+}
 
 type LoginPageProps = {
   initialMode?: AuthMode
@@ -33,10 +42,12 @@ export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
   const [goal, setGoal] = useState<Goal>('MAINTAIN')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState('')
+  const [isSuccess, setIsSuccess] = useState(false)
 
   const changeMode = (nextMode: AuthMode) => {
     setMode(nextMode)
     setMessage('')
+    setIsSuccess(false)
   }
 
   const saveLogin = async () => {
@@ -52,15 +63,24 @@ export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setMessage('')
-
-    if (mode === 'reset') {
-      setMessage('비밀번호 재설정 API가 준비되지 않았습니다.')
-      return
-    }
+    setIsSuccess(false)
 
     setIsSubmitting(true)
 
     try {
+      if (mode === 'reset') {
+        const response = await requestPasswordReset(email.trim())
+
+        if (!response.success) {
+          throw new Error(
+            response.message || '재설정 이메일 요청에 실패했습니다.',
+          )
+        }
+
+        setIsSuccess(true)
+        return
+      }
+
       if (mode === 'login') {
         await saveLogin()
         navigate(redirectTo, { replace: true })
@@ -96,7 +116,9 @@ export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
           ? error.message
           : mode === 'login'
             ? '로그인에 실패했습니다.'
-            : '회원가입에 실패했습니다.',
+            : mode === 'reset'
+              ? '비밀번호 재설정에 실패했습니다.'
+              : '회원가입에 실패했습니다.',
       )
     } finally {
       setIsSubmitting(false)
@@ -109,31 +131,64 @@ export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
     (!height || Number(height) > 0)
 
   const isFormValid =
-    email.trim() !== '' &&
-    (mode === 'reset' || password !== '') &&
-    (mode !== 'signup' || isSignupValid)
+    mode === 'reset'
+      ? isValidEmail(email)
+      : email.trim() !== '' &&
+        password !== '' &&
+        (mode !== 'signup' || isSignupValid)
 
   return (
-    <div className={styles.container}>
+    <div
+      className={`${styles.container} ${
+        mode === 'reset' ? styles.resetPage : ''
+      }`}
+    >
       {/* 상단 타이틀 */}
-      <div className={styles.titleGroup}>
-        <h1 className={styles.title}>
+      <div
+        className={
+          mode === 'reset' ? styles.resetTitleGroup : styles.titleGroup
+        }
+      >
+        <h1 className={mode === 'reset' ? styles.resetTitle : styles.title}>
           {mode === 'reset'
             ? '비밀번호 재설정'
             : '로그인 / 회원가입'}
         </h1>
 
-        <p className={styles.subTitle}>
+        <p
+          className={
+            mode === 'reset' ? styles.resetSubTitle : styles.subTitle
+          }
+        >
           {mode === 'reset'
-            ? '가입했던 이메일을 입력하시면 비밀번호 재설정 링크를 보냅니다.'
-            : '사용자는 이메일과 비밀번호로 회원가입 후 로그인하여 서비스를 이용합니다.'}
+            ? '가입할 때 사용한 이메일을 입력하시면, 비밀번호 재설정 링크를 보내드려요.'
+            : '사용자는 이메일과 비밀번호로 회원가입 후 로그인하여 서비스를 이용합니다. 로그인 시 JWT 기반 인증 토큰이 발급됩니다.'}
         </p>
-        {mode === 'login' && (
-          <p className={styles.subTitle}>
-            임시 계정: {DEMO_ACCOUNT.email} / {DEMO_ACCOUNT.password}
-          </p>
-        )}
       </div>
+
+      {mode === 'reset' && isSuccess && (
+        <div className={styles.sentCard}>
+          <div className={styles.sentContent}>
+            <span className={styles.sentIcon}>
+              <span className={styles.sentIconInner}>
+                <img
+                  src={resetLinkIcon}
+                  alt=""
+                  className={styles.sentIconLeaf}
+                  width={43.6029}
+                  height={43.562}
+                />
+              </span>
+            </span>
+            <div className={styles.sentText}>
+              <p className={styles.sentHeading}>재설정 링크를 보냈어요</p>
+              <p className={styles.sentDesc}>
+                입력한 이메일로 비밀번호 재설정 링크를 전송했습니다.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 로그인/회원가입 탭 */}
       {mode !== 'reset' && (
@@ -161,7 +216,13 @@ export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
       )}
 
       {/* 폼 영역 */}
-      <form className={styles.formCard} onSubmit={handleSubmit}>
+      {!(mode === 'reset' && isSuccess) && (
+      <form
+        className={`${styles.formCard} ${
+          mode === 'reset' ? styles.resetFormCard : ''
+        }`}
+        onSubmit={handleSubmit}
+      >
         {/* 회원가입 시 닉네임 입력창 */}
         {mode === 'signup' && (
           <div className={styles.inputGroup}>
@@ -181,7 +242,24 @@ export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
           </div>
         )}
 
-        {/* 공통 이메일 입력창 */}
+        {mode === 'reset' && (
+          <div className={`${styles.inputGroup} ${styles.resetInputGroup}`}>
+            <label className={`${styles.label} ${styles.resetLabel}`} htmlFor="reset-email">
+              이메일 (아이디)
+            </label>
+            <input
+              id="reset-email"
+              type="email"
+              placeholder="you@myongji.ac.kr"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              className={`${styles.input} ${styles.resetInput}`}
+              required
+            />
+          </div>
+        )}
+
+        {mode !== 'reset' && (
         <div className={styles.inputGroup}>
           <label className={styles.label} htmlFor="auth-email">
             이메일 (아이디)
@@ -197,6 +275,7 @@ export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
             required
           />
         </div>
+        )}
 
         {/* 비밀번호 입력창 */}
         {mode !== 'reset' && (
@@ -319,26 +398,48 @@ export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
         )}
 
         {message && (
-          <p className={styles.message} role="alert">
+          <p
+            className={isSuccess ? styles.successMessage : styles.message}
+            role="alert"
+          >
             {message}
           </p>
         )}
 
-        <button
-          type="submit"
-          disabled={!isFormValid || isSubmitting}
-          className={`${styles.submitBtn} ${
-            isFormValid && !isSubmitting ? styles.activeSubmitBtn : ''
-          }`}
-        >
-          {isSubmitting
-            ? '처리 중...'
-            : mode === 'login'
-              ? '로그인'
+        {mode === 'reset' ? (
+          <div className={styles.resetActions}>
+            <button
+              type="submit"
+              disabled={!isFormValid || isSubmitting}
+              className={`${styles.submitBtn} ${styles.resetSubmitBtn} ${
+                isFormValid && !isSubmitting ? styles.activeSubmitBtn : ''
+              }`}
+            >
+              {isSubmitting ? '처리 중...' : '재설정 링크 보내기'}
+            </button>
+            <button
+              type="button"
+              className={styles.resetBackLink}
+              onClick={() => changeMode('login')}
+            >
+              로그인으로 돌아가기
+            </button>
+          </div>
+        ) : (
+          <button
+            type="submit"
+            disabled={!isFormValid || isSubmitting}
+            className={`${styles.submitBtn} ${
+              isFormValid && !isSubmitting ? styles.activeSubmitBtn : ''
+            }`}
+          >
+            {isSubmitting
+              ? '처리 중...'
               : mode === 'signup'
                 ? '회원가입하고 시작하기'
-                : '비밀번호 재설정 이메일 받기'}
-        </button>
+                : '로그인'}
+          </button>
+        )}
 
         {/* 회원가입 안내 문구 */}
         {mode === 'signup' && (
@@ -347,18 +448,8 @@ export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
             이동해요.
           </p>
         )}
-
-        {/* 로그인 화면으로 돌아가기 */}
-        {mode === 'reset' && (
-          <button
-            type="button"
-            className={styles.backToLogin}
-            onClick={() => changeMode('login')}
-          >
-            로그인 화면으로 돌아가기
-          </button>
-        )}
       </form>
+      )}
     </div>
   )
 }

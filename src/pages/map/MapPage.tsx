@@ -11,6 +11,11 @@ import locationSearchIcon from '@/assets/icons/location-search.svg'
 import { Tag } from '@/components/common/Tag'
 import { RestaurantCard } from './RestaurantCard'
 import { CUISINE_FILTERS, FOOD_TYPE_FILTERS, formatDistance } from './mapData'
+import {
+  getKakaoRouteUrl,
+  getOsmEmbedUrl,
+  getRestaurantCoords,
+} from './mapLocation'
 import styles from '@/styles/pages/map/MapPage.module.css'
 
 export function MapPage() {
@@ -145,6 +150,7 @@ export function MapPage() {
     selectedDetail?.restaurant.restaurantId === selectedId
       ? selectedDetail.restaurant
       : (selectedRecommendation?.restaurant ?? null)
+  const selectedCoords = getRestaurantCoords(selectedRestaurant)
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -247,7 +253,18 @@ export function MapPage() {
         </aside>
 
         <div className={styles.mapArea}>
-          <div className={styles.mapPlaceholder} aria-label="지도 영역" />
+          {selectedCoords ? (
+            <iframe
+              className={styles.mapFrame}
+              title={`${selectedRestaurant?.name ?? '선택한 식당'} 위치`}
+              src={getOsmEmbedUrl(
+                selectedCoords.latitude,
+                selectedCoords.longitude,
+              )}
+            />
+          ) : (
+            <div className={styles.mapPlaceholder} aria-label="지도 영역" />
+          )}
 
           <button
             type="button"
@@ -264,7 +281,7 @@ export function MapPage() {
             />
           </button>
 
-          {selectedRestaurant && (
+          {selectedRestaurant && !selectedCoords && (
             <div className={styles.marker}>
               <div className={styles.markerPin}>
                 <img
@@ -285,7 +302,26 @@ export function MapPage() {
                   {formatDistance(selectedRecommendation)}
                 </p>
               </div>
-              <button type="button" className={styles.routeButton}>
+              <button
+                type="button"
+                className={styles.routeButton}
+                disabled={!selectedCoords}
+                onClick={() => {
+                  if (!selectedCoords || !selectedRestaurant) {
+                    return
+                  }
+
+                  window.open(
+                    getKakaoRouteUrl(
+                      selectedRestaurant.name,
+                      selectedCoords.latitude,
+                      selectedCoords.longitude,
+                    ),
+                    '_blank',
+                    'noopener,noreferrer',
+                  )
+                }}
+              >
                 경로 안내
               </button>
             </div>
