@@ -15,18 +15,6 @@ export function getRestaurantCoords(restaurant?: RestaurantResponse | null) {
   }
 }
 
-export function getOsmEmbedUrl(latitude: number, longitude: number) {
-  const delta = 0.004
-  const bbox = [
-    longitude - delta,
-    latitude - delta,
-    longitude + delta,
-    latitude + delta,
-  ].join(',')
-
-  return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${latitude},${longitude}`
-}
-
 export function getKakaoRouteUrl(
   name: string,
   latitude: number,
