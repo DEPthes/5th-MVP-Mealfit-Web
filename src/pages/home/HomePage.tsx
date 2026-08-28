@@ -37,8 +37,8 @@ const goalLabels: Record<string, string> = {
   GAIN: '근육량 증가',
 }
 
-const activityLabels: Record<string, string> = {
-  SEDENTARY: '없음',
+const exerciseLabels: Record<string, string> = {
+  NONE: '운동 없음',
   LIGHT: '주 1~2회',
   MODERATE: '주 3~4회',
   ACTIVE: '주 5~6회',
@@ -53,14 +53,18 @@ const diseaseLabels: Record<string, string> = {
 
 export function HomePage() {
   const navigate = useNavigate()
+
   const [selectedFilter, setSelectedFilter] = useState(
     HOME_FILTERS[0].label,
   )
+
   const [recommendations, setRecommendations] = useState<
     RecommendationItem[]
   >([])
+
   const [isRecommendLoading, setIsRecommendLoading] =
     useState(true)
+
   const [recommendError, setRecommendError] = useState('')
 
   const [inbodyData, setInbodyData] =
@@ -198,10 +202,10 @@ export function HomePage() {
     ? goalLabels[profile.goal] ?? profile.goal
     : '-'
 
-  const activityLevel = profile?.activityLevel
-    ? activityLabels[profile.activityLevel] ??
-      profile.activityLevel
-    : '-'
+  const activityLevel = profile?.exerciseCount
+    ? exerciseLabels[profile.exerciseCount] ??
+      profile.exerciseCount
+    : '운동량 미설정'
 
   const diseases = profile?.diseases ?? []
 
@@ -453,7 +457,9 @@ export function HomePage() {
             )}
 
             {!isRecommendLoading && recommendError && (
-              <p className={styles.foodStatus}>{recommendError}</p>
+              <p className={styles.foodStatus}>
+                {recommendError}
+              </p>
             )}
 
             {!isRecommendLoading &&
@@ -506,6 +512,7 @@ export function HomePage() {
                         <span className={styles.matchNum}>
                           {formatMatchRate(item.topMatchRate)}
                         </span>
+
                         <span className={styles.matchLabel}>
                           MATCH
                         </span>
@@ -521,6 +528,7 @@ export function HomePage() {
                           alt="지도"
                           className={styles.mapIcon}
                         />
+
                         <span>지도에서 보기</span>
                       </button>
                     </div>

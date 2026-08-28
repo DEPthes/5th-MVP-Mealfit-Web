@@ -1,6 +1,5 @@
 import { apiFetch } from './client'
 import type {
-  ActivityLevel,
   ApiResponse,
   Gender,
   Goal,
@@ -13,7 +12,6 @@ export interface SignupRequest {
   height?: number
   gender: Gender
   birthDate: string
-  activityLevel: ActivityLevel
   goal: Goal
 }
 
