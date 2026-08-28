@@ -11,13 +11,13 @@ import resetLinkIcon from '@/assets/icons/reset-link.svg'
 
 type AuthMode = 'login' | 'signup' | 'reset'
 
-// 이메일 유효성 및 30자 이내 검증
+
 function isValidEmail(value: string) {
   const trimmed = value.trim()
   return trimmed.length <= 30 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)
 }
 
-// 비밀번호 8~30자, 영문 대문자, 소문자, 특수문자 각 1자 이상 포함 검증
+
 function isValidPassword(value: string) {
   if (value.length < 8 || value.length > 30) return false
   const hasUpperCase = /[A-Z]/.test(value)
@@ -91,14 +91,13 @@ export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
         return
       }
 
-      // 회원가입 제출
+   
       const response = await signup({
         email: email.trim(),
         password,
         nickname: nickname.trim(),
         gender: 'MALE',
         birthDate: '2000-01-01',
-        activityLevel: 'SEDENTARY',
         goal: 'MAINTAIN',
       })
 
@@ -119,7 +118,7 @@ export function LoginPage({ initialMode = 'login' }: LoginPageProps) {
     }
   }
 
-  // 폼 유효성 조건
+
   const isFormValid =
     mode === 'reset'
       ? isValidEmail(email)

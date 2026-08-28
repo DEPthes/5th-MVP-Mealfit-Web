@@ -1,5 +1,3 @@
-// 서버 API 공통 타입 / Enum
-
 export interface ApiResponse<T> {
   success: boolean
   code: string
@@ -9,13 +7,21 @@ export interface ApiResponse<T> {
 
 export type Gender = 'MALE' | 'FEMALE'
 
-export type ActivityLevel =
-  | 'SEDENTARY'
+export type ExerciseCount =
+  | 'NONE'
   | 'LIGHT'
   | 'MODERATE'
   | 'ACTIVE'
 
-export type Goal = 'LOSS' | 'MAINTAIN' | 'GAIN'
+export type ExerciseIntensity =
+  | 'LOW'
+  | 'MEDIUM'
+  | 'HIGH'
+
+export type Goal =
+  | 'LOSS'
+  | 'MAINTAIN'
+  | 'GAIN'
 
 export type Disease =
   | 'GASTROESOPHAGEAL_REFLUX'
@@ -46,7 +52,9 @@ export type FoodType =
   | 'PIZZA'
   | 'SANDWICH'
 
-export type NutritionSource = 'OFFICIAL' | 'ESTIMATED'
+export type NutritionSource =
+  | 'OFFICIAL'
+  | 'ESTIMATED'
 
 export type NutritionFilter =
   | 'HIGH_PROTEIN'
@@ -54,6 +62,7 @@ export type NutritionFilter =
   | 'HIGH_CARB'
   | 'LOW_SODIUM'
   | 'LOW_FAT'
+  | 'REFLUX_ESOPHAGITIS_SAFE'
 
 export type MatchReason =
   | 'MENU_NAME'
@@ -61,7 +70,9 @@ export type MatchReason =
   | 'REPRESENTATIVE_FOOD'
   | 'FOOD_TYPE_TAG'
 
-export type ReferencePoint = 'MAIN_GATE' | 'BACK_GATE'
+export type ReferencePoint =
+  | 'MAIN_GATE'
+  | 'BACK_GATE'
 
 export interface Nutrition {
   calories?: number
@@ -104,4 +115,14 @@ export interface PageResponse<T> {
   size: number
   first: boolean
   last: boolean
+}
+
+export interface UpdateProfileRequest {
+  nickname: string
+  height?: number
+  goal: Goal
+  targetWeight?: number
+  exerciseCount?: ExerciseCount
+  exerciseIntensity?: ExerciseIntensity
+  diseases?: Disease[]
 }
