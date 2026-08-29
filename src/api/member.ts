@@ -1,5 +1,4 @@
 import { apiFetch } from './client'
-
 import type {
   ApiResponse,
   Disease,
@@ -11,16 +10,16 @@ import type {
 
 export interface MemberProfile {
   memberId: number
-  email: string
   nickname: string
+  email: string
   height?: number
   targetWeight?: number
   gender: Gender
   birthDate: string
-  exerciseCount?: ExerciseCount
-  exerciseIntensity?: ExerciseIntensity
   goal: Goal
   hasTarget: boolean
+  exerciseCount?: ExerciseCount
+  exerciseIntensity?: ExerciseIntensity
   diseases?: Disease[]
 }
 
@@ -34,25 +33,17 @@ export interface UpdateMemberRequest {
   diseases?: Disease[]
 }
 
-export async function getMyProfile(): Promise<
-  ApiResponse<MemberProfile>
-> {
-  return apiFetch<ApiResponse<MemberProfile>>(
-    '/api/members/me',
-    {
-      method: 'GET',
-    },
-  )
+export async function getMyProfile(): Promise<ApiResponse<MemberProfile>> {
+  return apiFetch<ApiResponse<MemberProfile>>('/api/members/me', {
+    method: 'GET',
+  })
 }
 
 export async function updateMyProfile(
   data: UpdateMemberRequest,
 ): Promise<ApiResponse<null>> {
-  return apiFetch<ApiResponse<null>>(
-    '/api/members/me',
-    {
-      method: 'PATCH',
-      body: JSON.stringify(data),
-    },
-  )
+  return apiFetch<ApiResponse<null>>('/api/members/me', {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  })
 }

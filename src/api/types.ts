@@ -9,19 +9,13 @@ export type Gender = 'MALE' | 'FEMALE'
 
 export type ExerciseCount =
   | 'NONE'
-  | 'LIGHT'
-  | 'MODERATE'
-  | 'ACTIVE'
+  | 'ONE_TO_TWO'
+  | 'THREE_TO_FOUR'
+  | 'FIVE_TO_SIX'
 
-export type ExerciseIntensity =
-  | 'LOW'
-  | 'MEDIUM'
-  | 'HIGH'
+export type ExerciseIntensity = 'LOW' | 'MEDIUM' | 'HIGH'
 
-export type Goal =
-  | 'LOSS'
-  | 'MAINTAIN'
-  | 'GAIN'
+export type Goal = 'LOSS' | 'MAINTAIN' | 'GAIN'
 
 export type Disease =
   | 'GASTROESOPHAGEAL_REFLUX'
@@ -52,9 +46,7 @@ export type FoodType =
   | 'PIZZA'
   | 'SANDWICH'
 
-export type NutritionSource =
-  | 'OFFICIAL'
-  | 'ESTIMATED'
+export type NutritionSource = 'OFFICIAL' | 'ESTIMATED'
 
 export type NutritionFilter =
   | 'HIGH_PROTEIN'
@@ -70,9 +62,7 @@ export type MatchReason =
   | 'REPRESENTATIVE_FOOD'
   | 'FOOD_TYPE_TAG'
 
-export type ReferencePoint =
-  | 'MAIN_GATE'
-  | 'BACK_GATE'
+export type ReferencePoint = 'MAIN_GATE' | 'BACK_GATE'
 
 export interface Nutrition {
   calories?: number

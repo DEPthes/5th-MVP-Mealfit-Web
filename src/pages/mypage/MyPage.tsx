@@ -23,9 +23,9 @@ import styles from './MyPage.module.css'
 
 const exerciseLabels: Record<ExerciseCount, string> = {
   NONE: '운동 없음',
-  LIGHT: '주 1~2회',
-  MODERATE: '주 3~4회',
-  ACTIVE: '주 5~6회',
+  ONE_TO_TWO: '주 1~2회',
+  THREE_TO_FOUR: '주 3~4회',
+  FIVE_TO_SIX: '주 5~6회',
 }
 
 const exerciseIntensityLabels: Record<
@@ -40,7 +40,7 @@ const exerciseIntensityLabels: Record<
 const goalLabels: Record<Goal, string> = {
   LOSS: '체중 감량',
   MAINTAIN: '체중 유지',
-  GAIN: '근육량 증가 +0kg',
+  GAIN: '근육량 증가',
 }
 
 const diseaseOptions: ReadonlyArray<{
@@ -65,9 +65,8 @@ const diseaseOptions: ReadonlyArray<{
   },
 ]
 
-// 날짜 포맷 변환 함수 (YYYY.MM.DD)
 const formatDate = (dateString?: string) => {
-  if (!dateString) return '2026.00.00'
+  if (!dateString) return '-'
 
   const date = new Date(dateString)
 
@@ -112,22 +111,22 @@ export function MyPage() {
 
   const applyProfile = (member: MemberProfile) => {
     setProfile(member)
-    setNickname(member.nickname)
+    setNickname(member.nickname ?? '')
     setHeight(member.height?.toString() ?? '')
 
-    if (member.exerciseCount) {
+    if (member.exerciseCount && member.exerciseCount in exerciseLabels) {
       setExerciseCount(member.exerciseCount)
     } else {
       setExerciseCount('NONE')
     }
 
-    if (member.exerciseIntensity) {
+    if (member.exerciseIntensity && member.exerciseIntensity in exerciseIntensityLabels) {
       setExerciseIntensity(member.exerciseIntensity)
     } else {
       setExerciseIntensity('LOW')
     }
 
-    setGoal(member.goal)
+    setGoal(member.goal ?? 'MAINTAIN')
     setDiseases(member.diseases ?? [])
   }
 
@@ -253,9 +252,7 @@ export function MyPage() {
     setMessage('')
 
     const trimmedNickname = nickname.trim()
-    const parsedHeight = height
-      ? Number(height)
-      : undefined
+    const parsedHeight = height !== '' ? Number(height) : undefined
 
     if (!trimmedNickname) {
       setMessage('닉네임을 입력해 주세요.')
@@ -264,23 +261,25 @@ export function MyPage() {
 
     if (
       parsedHeight !== undefined &&
-      parsedHeight <= 0
+      (isNaN(parsedHeight) || parsedHeight <= 0)
     ) {
-      setMessage('키는 양수로 입력해 주세요.')
+      setMessage('키는 올바른 양수로 입력해 주세요.')
       return
     }
 
     setIsSaving(true)
 
     try {
-      const response = await updateMyProfile({
+      const updatePayload = {
         nickname: trimmedNickname,
         height: parsedHeight,
         exerciseCount,
         exerciseIntensity,
         goal,
         diseases,
-      })
+      }
+
+      const response = await updateMyProfile(updatePayload)
 
       if (!response.success) {
         throw new Error(
@@ -296,7 +295,7 @@ export function MyPage() {
         updatedProfile.nickname,
       )
 
-      setMessage('프로필이 수정되었습니다.')
+      setMessage('프로필이 성공적으로 수정되었습니다.')
       setIsEditing(false)
     } catch (error) {
       setMessage(
@@ -312,7 +311,7 @@ export function MyPage() {
   if (isLoading) {
     return (
       <p className={styles.status}>
-        프로필을 불러오는 중입니다.
+        프로필을 불러오는 중입니다...
       </p>
     )
   }
@@ -352,7 +351,7 @@ export function MyPage() {
     inbodyHistory.length > 0 &&
     inbodyHistory[0].inbodyScore != null
       ? `${inbodyHistory[0].inbodyScore}점`
-      : '00점'
+      : '0점'
 
   const recentInbodyDate =
     inbodyHistory.length > 0
@@ -361,9 +360,7 @@ export function MyPage() {
         )
       : '-'
 
-  const joinedDate = formatDate(
-    (profile as { createdAt?: string }).createdAt,
-  )
+  const joinedDate = formatDate((profile as any)?.createdAt)
 
   return (
     <div className={styles.pageWrapper}>
@@ -383,7 +380,7 @@ export function MyPage() {
           <div className={styles.profileHeader}>
             <div className={styles.profileInfo}>
               <div className={styles.avatar}>
-                {profile.nickname.charAt(0)}
+                {profile.nickname ? profile.nickname.charAt(0) : 'U'}
               </div>
 
               <div className={styles.userInfo}>
@@ -804,9 +801,7 @@ export function MyPage() {
                         styles.infoValue
                       }
                     >
-                      {goalLabels[
-                        profile.goal
-                      ]}
+                      {goalLabels[profile.goal] ?? profile.goal}
                     </span>
                   </div>
 
@@ -827,9 +822,7 @@ export function MyPage() {
                       }
                     >
                       {profile?.exerciseCount
-                        ? exerciseLabels[
-                            profile.exerciseCount
-                          ]
+                        ? exerciseLabels[profile.exerciseCount] ?? profile.exerciseCount
                         : '미설정'}
                     </span>
                   </div>
@@ -851,10 +844,7 @@ export function MyPage() {
                       }
                     >
                       {profile?.exerciseIntensity
-                        ? exerciseIntensityLabels[
-                            profile
-                              .exerciseIntensity
-                          ]
+                        ? exerciseIntensityLabels[profile.exerciseIntensity] ?? profile.exerciseIntensity
                         : '미설정'}
                     </span>
                   </div>

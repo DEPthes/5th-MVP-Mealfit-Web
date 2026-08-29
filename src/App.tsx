@@ -21,31 +21,34 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<ResetLinkRedirect />}>
-          <Route element={<Layout />}>
-            <Route element={<ProtectedRoute />}>
-              <Route index element={<HomePage />} />
-              <Route path="health-data" element={<HealthDataPage />} />
-              <Route path="ai-report" element={<AiReportPage />} />
-              <Route path="map" element={<MapPage />} />
-              <Route path="mypage" element={<MyPage />} />
-            </Route>
-            <Route element={<GuestRoute />}>
-              <Route path="login" element={<LoginPage />} />
-              <Route path="signup" element={<SignupPage />} />
-            </Route>
+        <Route element={<Layout />}>
+          <Route element={<ProtectedRoute />}>
+            <Route index element={<HomePage />} />
+            <Route path="health-data" element={<HealthDataPage />} />
+            <Route path="ai-report" element={<AiReportPage />} />
+            <Route path="map" element={<MapPage />} />
+            <Route path="mypage" element={<MyPage />} />
+          </Route>
+
+          <Route element={<GuestRoute />}>
+            <Route path="login" element={<LoginPage />} />
+            <Route path="signup" element={<SignupPage />} />
+          </Route>
+
+          <Route element={<ResetLinkRedirect />}>
             <Route path="password-reset" element={<PasswordResetPage />} />
             <Route path="reset-password" element={<PasswordResetPage />} />
             <Route path="password/reset" element={<PasswordResetPage />} />
             <Route path="reset" element={<PasswordResetPage />} />
             <Route path="reset/:token" element={<PasswordResetPage />} />
-            <Route path="about" element={<AboutPage />} />
-            <Route path="terms" element={<TermsPage />} />
-            <Route path="privacy" element={<PrivacyPage />} />
-            <Route path="support" element={<SupportPage />} />
-            <Route path="team" element={<TeamPage />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
+
+          <Route path="about" element={<AboutPage />} />
+          <Route path="terms" element={<TermsPage />} />
+          <Route path="privacy" element={<PrivacyPage />} />
+          <Route path="support" element={<SupportPage />} />
+          <Route path="team" element={<TeamPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
     </BrowserRouter>

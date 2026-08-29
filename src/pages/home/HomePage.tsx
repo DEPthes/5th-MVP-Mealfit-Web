@@ -87,7 +87,6 @@ export function HomePage() {
       setIsLoading(true)
 
       try {
-        // 회원 정보
         try {
           const response = await getMyProfile()
 
@@ -98,7 +97,6 @@ export function HomePage() {
           console.error('회원 정보 조회 실패:', error)
         }
 
-        // 최신 인바디
         try {
           const response = await getLatestInbody()
 
@@ -109,7 +107,6 @@ export function HomePage() {
           console.info('최신 인바디가 없습니다.', error)
         }
 
-        // 목표 영양치
         try {
           const response = await getMyTargets()
 
@@ -120,7 +117,6 @@ export function HomePage() {
           console.info('목표 영양치가 없습니다.', error)
         }
 
-        // 인바디 점수 추이
         try {
           const response = await getScoreHistory()
 
@@ -521,7 +517,11 @@ export function HomePage() {
                       <button
                         type="button"
                         className={styles.mapActionBtn}
-                        onClick={() => navigate('/map')}
+                        onClick={() =>
+                          navigate(
+                            `/map?restaurantId=${item.restaurant.restaurantId}`,
+                          )
+                        }
                       >
                         <img
                           src={mapIcon}
